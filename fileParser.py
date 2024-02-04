@@ -1,4 +1,5 @@
 import json
+import xml.etree.ElementTree as ET
 
 
 def stringToTypeOfValue(string):
@@ -60,3 +61,46 @@ def arrayToCsv(array, name):
         r += '\n' + ';'.join(line)
     f = open(name, 'w')
     f.write(r)
+
+
+def recuXml(root):
+    d = {}
+    for i in root:
+        if len(i) == 0:
+            d[i.tag] = stringToTypeOfValue(i.text)
+        else:
+            d[i.tag] = recuXml(i)
+    return d
+
+
+def xmlToArray(name):
+    tree = ET.parse(name)
+    root = tree.getroot()
+    res = []
+    for i in root:
+        res.append(recuXml(i))
+    return res
+
+
+def dictToXml(element, dictionary):
+    for key, value in dictionary.items():
+        subElement = ET.SubElement(element, key)
+        if isinstance(value, dict):
+            dictToXml(subElement, value)
+        else:
+            subElement.text = str(value)
+
+
+def arrayToXml(array, r='root'):
+    root = ET.Element(r)
+
+    for item in array:
+        dictToXml(root, item)
+
+    tree = ET.ElementTree(root)
+    return tree
+
+
+def saveXml(tree, name):
+    with open(name, 'wb') as f:
+        tree.write(f)
