@@ -1,7 +1,7 @@
 import json
 
 
-def stringToValue(string):
+def stringToTypeOfValue(string):
     if string.isdigit():
         if '.' in string:
             return float(string)
@@ -34,7 +34,7 @@ def csvToArray(name):
         if i == '': break
         d = {}
         for j, value in enumerate(i.split(';')):
-            d[l[j]] = stringToValue(value)
+            d[l[j]] = stringToTypeOfValue(value)
         res.append(d)
     return res
 
@@ -46,10 +46,11 @@ def isValue(array):
                 return False
     return True
 
+
 def arrayToCsv(array, name):
     l = [i for i in array[0]]
     if not isValue(array):
-        print("ERROR : Values can t be a csv file")
+        print("ERROR : Values can't be a csv file")
         return
     r = ';'.join(l)
     for i in array:
