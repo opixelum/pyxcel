@@ -1,5 +1,6 @@
 import json
 import xml.etree.ElementTree as ET
+import yaml
 
 
 def stringToTypeOfValue(string):
@@ -16,31 +17,30 @@ def stringToTypeOfValue(string):
 
 
 def jsonFileToArray(name):
-    f = open(name, 'r')
-    arr = json.load(f)
-    return arr
+    with open(name, 'r') as f:
+        return json.load(f)
 
 
 def arrayToJson(arr, name):
-    f = open(name, 'w')
-    json.dump(arr, f)
+    with open(name, 'w') as f:
+        json.dump(arr, f)
 
 
 def csvToArray(name):
     res = []
-    f = open(name, 'r')
-    t = f.read().split('\n')
-    l = t[0].split(';')
-    for i in t[1:]:
-        if i == '': break
-        d = {}
-        for j, value in enumerate(i.split(';')):
-            d[l[j]] = stringToTypeOfValue(value)
-        res.append(d)
-    return res
+    with open(name, 'r') as f:
+        t = f.read().split('\n')
+        l = t[0].split(';')
+        for i in t[1:]:
+            if i == '': break
+            d = {}
+            for j, value in enumerate(i.split(';')):
+                d[l[j]] = stringToTypeOfValue(value)
+            res.append(d)
+        return res
 
 
-def isValue(array):
+def isAllValue(array):
     for i in array:
         for j in i:
             if type(i[j]) == list or type(i[j]) == dict:
@@ -50,7 +50,7 @@ def isValue(array):
 
 def arrayToCsv(array, name):
     l = [i for i in array[0]]
-    if not isValue(array):
+    if not isAllValue(array):
         print("ERROR : Values can't be a csv file")
         return
     r = ';'.join(l)
@@ -59,8 +59,8 @@ def arrayToCsv(array, name):
         for j in l:
             line.append(str(i[j]))
         r += '\n' + ';'.join(line)
-    f = open(name, 'w')
-    f.write(r)
+    with open(name, 'w') as f:
+        f.write(r)
 
 
 def recuXml(root):
@@ -104,3 +104,14 @@ def arrayToXml(array, r='root'):
 def saveXml(tree, name):
     with open(name, 'wb') as f:
         tree.write(f)
+
+
+def yamlToArray(name):
+    with open(name, 'r') as f:
+        arr = yaml.safe_load(f)
+    return arr
+
+
+def arrayToYaml(array, name):
+    with open(name, 'w') as f:
+        yaml.dump(array, f)
