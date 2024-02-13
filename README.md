@@ -1,5 +1,18 @@
-# pyxcel
+# Pyxcel
 Excel, but in Python.
 
-# install this before using
+## Prerequisites
+
+Install the required package using the following command:
+
+- Using pip:
+
+```bash
 pip install pyyaml
+```
+
+- Using conda:
+
+```bash
+conda install pyyaml
+```
