@@ -21,18 +21,18 @@ def createTable():
     for i in range(numRows):
         Main.window.grid_rowconfigure(i, weight=1)
 
-    for i, value in enumerate(Main.context['array'][0]):
+    for i, value in enumerate(Main.context["array"][0]):
         tmp = value
-        if tmp == Main.context['sortKey']:
-            if Main.context['sortReverse']:
-                tmp += ' ▼'
+        if tmp == Main.context["sortKey"]:
+            if Main.context["sortReverse"]:
+                tmp += " ▼"
             else:
-                tmp += ' ▲'
+                tmp += " ▲"
         label = tk.Label(Main.window, text=tmp)
         label.grid(row=0, column=i)
-        label.bind('<Button-1>', lambda e, x=value: sortArray(x))
-        if type(Main.context['array'][0][value]) != str:
-            label.bind('<Button-3>', lambda e, x=value: makeRightClickMenu(x))
+        label.bind("<Button-1>", lambda e, x=value: sortArray(x))
+        if type(Main.context["array"][0][value]) != str:
+            label.bind("<Button-3>", lambda e, x=value: makeRightClickMenu(x))
 
     for i, row in enumerate(Main.context["array"]):
         row_vars = {}
@@ -108,8 +108,6 @@ def initWindow():
         "file": "",
         "columns": [],
     }
-
-    # Listbox
     displayArray()
     Main.window.mainloop()
 
@@ -124,7 +122,7 @@ def clearWindow():
 def displayArray():
     clearWindow()
     makeMenu()
-    if len(Main.context['array']) == 0:
+    if len(Main.context["array"]) == 0:
         text = tk.Label(Main.window, text="No data to display")
         text.place(relx=0.5, rely=0.5, anchor="center")
     else:
@@ -159,49 +157,65 @@ def addRow():
 
 def showStats(column):
     displayArray()
-    windowStats = OpenWindow('300x300', 'Stats')
+    windowStats = OpenWindow("300x300", "Stats")
     # get type of column
-    typeStat = type(Main.context['array'][0][column])
+    typeStat = type(Main.context["array"][0][column])
     if typeStat == int or typeStat == float:
-        min = Main.context['array'][0][column]
-        max = Main.context['array'][0][column]
+        min = Main.context["array"][0][column]
+        max = Main.context["array"][0][column]
         avg = 0
-        for i in Main.context['array']:
+        for i in Main.context["array"]:
             if min > i[column]:
                 min = i[column]
             if max < i[column]:
                 max = i[column]
             avg += i[column]
-        avg /= len(Main.context['array'])
-        text = tk.Label(windowStats, text="Min : " + str(min) + "\nMax : " + str(max) + "\nAvg : " + str(avg))
-        text.place(relx=0.5, rely=0.5, anchor='center')
+        avg /= len(Main.context["array"])
+        text = tk.Label(
+            windowStats,
+            text="Min : " + str(min) + "\nMax : " + str(max) + "\nAvg : " + str(avg),
+        )
+        text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
         windowStats.mainloop()
     elif typeStat == bool:
         true = 0
         false = 0
-        for i in Main.context['array']:
+        for i in Main.context["array"]:
             if i[column]:
                 true += 1
             else:
                 false += 1
-        text = tk.Label(windowStats,
-                        text="True : " + str(true / len(Main.context['array']) * 100) + "%\nFalse : " + str(
-                            false / len(Main.context['array']) * 100) + "%")
-        text.place(relx=0.5, rely=0.5, anchor='center')
+        text = tk.Label(
+            windowStats,
+            text="True : "
+            + str(true / len(Main.context["array"]) * 100)
+            + "%\nFalse : "
+            + str(false / len(Main.context["array"]) * 100)
+            + "%",
+        )
+        text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
         windowStats.mainloop()
     elif typeStat == list:
-        min = len(Main.context['array'][0][column])
-        max = len(Main.context['array'][0][column])
+        min = len(Main.context["array"][0][column])
+        max = len(Main.context["array"][0][column])
         avg = 0
-        for i in Main.context['array']:
+        for i in Main.context["array"]:
             if min > len(i[column]):
                 min = len(i[column])
             if max < len(i[column]):
                 max = len(i[column])
             avg += len(i[column])
-        avg /= len(Main.context['array'])
-        text = tk.Label(windowStats, text="Taille min : " + str(min) + "\nTaille max : " + str(max) + "\nTaille moyenne : " + str(avg))
-        text.place(relx=0.5, rely=0.5, anchor='center')
+        avg /= len(Main.context["array"])
+        text = tk.Label(
+            windowStats,
+            text="Taille min : "
+            + str(min)
+            + "\nTaille max : "
+            + str(max)
+            + "\nTaille moyenne : "
+            + str(avg),
+        )
+        text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
