@@ -33,8 +33,13 @@ def createTable():
 
     for i in range(0, len(Main.context["array"])):
         for j, value in enumerate(Main.context["array"][i]):
-            label = tk.Label(Main.window, text=str(Main.context["array"][i][value]))
-            label.grid(row=i + 1, column=j)
+            cell_content = tk.StringVar()
+            cell_content.set(Main.context["array"][i][value])
+            cell = tk.Entry(
+                Main.window,
+                textvariable=cell_content,
+            )
+            cell.grid(row=i + 1, column=j)
 
 
 def openFile():
