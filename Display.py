@@ -79,7 +79,7 @@ def makeMenu():
 def initWindow():
     Main.window = OpenWindow('1000x500', 'Pyxcel')
     Main.context = {'array': [], 'sortKey': '', 'sortReverse': False, 'file': '', 'columns': []}
-
+    fileParser.getColumns(Main.context)
     # Menu
     makeMenu()
 

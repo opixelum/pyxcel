@@ -91,14 +91,14 @@ def dictToXml(element, dictionary):
             subElement.text = str(value)
 
 
-def arrayToXml(array, r='root'):
+def arrayToXml(array, name, r='root'):
     root = ET.Element(r)
 
     for item in array:
         dictToXml(root, item)
 
     tree = ET.ElementTree(root)
-    return tree
+    saveXml(tree, name)
 
 
 def saveXml(tree, name):
@@ -115,3 +115,11 @@ def yamlToArray(name):
 def arrayToYaml(array, name):
     with open(name, 'w') as f:
         yaml.dump(array, f)
+
+def getColums(array):
+    res = []
+    for i in array:
+        for j in i:
+            if j not in res:
+                res.append(j)
+    Main.context['columns'] = res
