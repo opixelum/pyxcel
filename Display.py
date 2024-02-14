@@ -36,7 +36,7 @@ def createTable():
 
 def openFile():
     file = tk.filedialog.askopenfile()
-    Main.context = {'array': [], 'sortKey': '', 'sortReverse': False}
+    Main.context = {'array': [], 'sortKey': '', 'sortReverse': False, 'file': '', 'columns': []}
     if file:
         # get type of file csv, json, xml, yaml
         ext = file.name.split('.')[-1]
@@ -48,11 +48,11 @@ def openFile():
         elif ext == 'xml':
             Main.context['array'] = fileParser.xmlToArray(file.name)
         elif ext == 'yaml':
-            # rajouter yaml
-            Main.context['array'] = []
+            Main.context['array'] = fileParser.yamlToArray(file.name)
         else:
             print('ERROR : File type not supported')
             Main.context['array'] = []
+        fileParser.getColumns(Main.context)
         displayArray()
 
 
@@ -62,7 +62,7 @@ def makeMenu():
     filemenu = tk.Menu(menubar, tearoff=0)
     filemenu.add_command(label="New", command=lambda: print('New'))
     filemenu.add_command(label="Open", command=lambda: openFile())
-    filemenu.add_command(label="Save", command=lambda: print('Save'))
+    filemenu.add_command(label="Save", command=lambda: fileParser.save())
     filemenu.add_command(label="Save as...", command=lambda: print('Save as...'))
     filemenu.add_separator()
     filemenu.add_command(label="Exit", command=Main.window.quit)
@@ -79,7 +79,6 @@ def makeMenu():
 def initWindow():
     Main.window = OpenWindow('1000x500', 'Pyxcel')
     Main.context = {'array': [], 'sortKey': '', 'sortReverse': False, 'file': '', 'columns': []}
-    fileParser.getColumns(Main.context)
     # Menu
     makeMenu()
 

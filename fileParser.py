@@ -2,6 +2,8 @@ import json
 import xml.etree.ElementTree as ET
 import yaml
 
+import Main
+
 
 def stringToTypeOfValue(string):
     if string.isdigit():
@@ -116,10 +118,28 @@ def arrayToYaml(array, name):
     with open(name, 'w') as f:
         yaml.dump(array, f)
 
-def getColums(array):
+def getColumns(array):
     res = []
     for i in array:
         for j in i:
             if j not in res:
                 res.append(j)
     Main.context['columns'] = res
+
+
+def save():
+    if Main.context['file'] == '':
+        print('ERROR : No file to save')
+        # change by saveAs
+        return
+    ext = Main.context['file'].split('.')[-1]
+    if ext == 'csv':
+        arrayToCsv(Main.context['array'], Main.context['file'])
+    elif ext == 'json':
+        arrayToJson(Main.context['array'], Main.context['file'])
+    elif ext == 'xml':
+        arrayToXml(Main.context['array'], Main.context['file'])
+    elif ext == 'yaml':
+        arrayToYaml(Main.context['array'], Main.context['file'])
+    else:
+        print('ERROR : File type not supported')
