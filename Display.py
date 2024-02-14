@@ -21,8 +21,8 @@ def createTable():
     for i in range(numRows):
         Main.window.grid_rowconfigure(i, weight=1)
 
-    for i, value in enumerate(Main.context["array"][0]):
-        tmp = value
+    for i, header in enumerate(Main.context["array"][0]):
+        tmp = header
         if tmp == Main.context["sortKey"]:
             if Main.context["sortReverse"]:
                 tmp += " ▼"
@@ -30,9 +30,9 @@ def createTable():
                 tmp += " ▲"
         label = tk.Label(Main.window, text=tmp)
         label.grid(row=0, column=i)
-        label.bind("<Button-1>", lambda e, x=value: sortArray(x))
-        if type(Main.context["array"][0][value]) != str:
-            label.bind("<Button-3>", lambda e, x=value: makeRightClickMenu(x))
+        label.bind("<Button-1>", lambda e, x=header: sortArray(x))
+        if type(Main.context["array"][0][header]) != str:
+            label.bind("<Button-3>", lambda e, x=header: makeRightClickMenu(x))
 
     for i, row in enumerate(Main.context["array"]):
         row_vars = {}
