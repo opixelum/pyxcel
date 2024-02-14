@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import filedialog
 import fileParser
 import Main
 
@@ -37,7 +38,7 @@ def createTable():
 
 
 def openFile():
-    file = tk.filedialog.askopenfile()
+    file = filedialog.askopenfile()
     Main.context = {
         "array": [],
         "sortKey": "",
