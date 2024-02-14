@@ -143,9 +143,16 @@ def getColumns(array):
 def save():
     if Main.context["file"] == "":
         print("ERROR : No file to save")
-        # change by saveAs
+        # TODO: change by saveAs
         return
+
     ext = Main.context["file"].split(".")[-1]
+
+    # Save the content of the cells in the array
+    for i, row in enumerate(Main.context["array"]):
+        for _, (key, _) in enumerate(row.items()):
+            row[key] = Main.context["cell_vars"][i][key].get()
+
     if ext == "csv":
         arrayToCsv(Main.context["array"], Main.context["file"])
     elif ext == "json":

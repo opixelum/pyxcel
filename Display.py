@@ -12,34 +12,30 @@ def OpenWindow(size, title):
 
 
 def createTable():
-    numRows = (
-        len(Main.context["array"]) + 1 if len(Main.context["array"]) + 1 > 10 else 10
-    )
+    numRows = max(len(Main.context["array"]) + 1, 10)
     numColumns = len(Main.context["array"][0])
+    Main.context["cell_vars"] = []  # Contains the value of each cell
+
     for i in range(numColumns):
         Main.window.grid_columnconfigure(i, weight=1)
     for i in range(numRows):
         Main.window.grid_rowconfigure(i, weight=1)
 
-    for i, value in enumerate(Main.context["array"][0]):
-        tmp = value
+    for i, header in enumerate(Main.context["array"][0]):
+        tmp = header
         if tmp == Main.context["sortKey"]:
-            if Main.context["sortReverse"]:
-                tmp += " ▼"
-            else:
-                tmp += " ▲"
-        button = tk.Button(Main.window, text=tmp, command=lambda x=value: sortArray(x))
+            tmp += " ▼" if Main.context["sortReverse"] else " ▲"
+        button = tk.Button(Main.window, text=tmp, command=lambda x=header: sortArray(x))
         button.grid(row=0, column=i)
 
-    for i in range(0, len(Main.context["array"])):
-        for j, value in enumerate(Main.context["array"][i]):
-            cell_content = tk.StringVar()
-            cell_content.set(Main.context["array"][i][value])
-            cell = tk.Entry(
-                Main.window,
-                textvariable=cell_content,
-            )
+    for i, row in enumerate(Main.context["array"]):
+        row_vars = {}
+        for j, (key, value) in enumerate(row.items()):
+            cell_content = tk.StringVar(value=value)
+            cell = tk.Entry(Main.window, textvariable=cell_content)
             cell.grid(row=i + 1, column=j)
+            row_vars[key] = cell_content
+        Main.context["cell_vars"].append(row_vars)
 
 
 def openFile():
