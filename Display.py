@@ -41,14 +41,15 @@ def createTable():
 
     for i, header in enumerate(Main.context["array"][0]):
         tmp = header
-        if tmp == Main.context["sortKey"]:
-            if Main.context["sortReverse"]:
-                tmp += " ▼"
-            else:
-                tmp += " ▲"
-        label = tk.Label(Main.window, text=tmp)
+        # TODO: add sort icons with entries (maybe with a button on the right of the header?)
+        # if tmp == Main.context["sortKey"]:
+        #    if Main.context["sortReverse"]:
+        #        tmp += " ▼"
+        #    else:
+        #        tmp += " ▲"
+        header_sv = tk.StringVar(value=tmp)
+        label = tk.Entry(Main.window, textvariable=header_sv)
         label.grid(row=0, column=i)
-        label.bind("<Button-1>", lambda _, x=header: sortArray(x))
         if not isinstance(Main.context["array"][0][header], str):
             label.bind("<Button-3>", lambda _, x=header: makeRightClickMenu(x))
 
@@ -65,6 +66,7 @@ def createTable():
             )
             cell = tk.Entry(Main.window, textvariable=cell_content)
             cell.grid(row=i + 1, column=j)
+            cell.bind("<Button-3>", lambda _, x=key: makeRightClickMenu(x))
             row_vars[key] = cell_content
 
         Main.context["cell_vars"].append(row_vars)
@@ -181,6 +183,7 @@ def makeMenu():
 def makeRightClickMenu(column):
     rightClickMenu = tk.Menu(Main.window, tearoff=0)
     rightClickMenu.add_command(label="Show stats", command=lambda: showStats(column))
+    rightClickMenu.add_command(label="Sort", command=lambda: sortArray(column))
     rightClickMenu.post(Main.window.winfo_pointerx(), Main.window.winfo_pointery())
 
 
@@ -237,9 +240,13 @@ def resetSort():
 
 
 def addRow():
-    """Adds a row to the table"""
+    """Adds a row to the table."""
     Main.context["array"].append({key: "" for key in Main.context["array"][0]})
     displayArray()
+
+
+def addColumn():
+    """Adds a column to the table."""
 
 
 def showStats(column):
