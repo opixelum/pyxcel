@@ -3,6 +3,7 @@ from tkinter import filedialog
 import fileParser
 import Main
 
+
 def OpenWindow(size, title):
     w = tk.Tk()
     w.geometry(size)
@@ -25,13 +26,18 @@ def createTable():
                 tmp += ' ▼'
             else:
                 tmp += ' ▲'
-        button = tk.Button(Main.window, text=tmp, command=lambda x=value: sortArray(x))
-        button.grid(row=0, column=i)
+        label = tk.Label(Main.window, text=tmp)
+        label.grid(row=0, column=i)
+        label.bind('<Button-1>', lambda e, x=value: sortArray(x))
+        if type(Main.context['array'][0][value]) != str:
+            label.bind('<Button-3>', lambda e, x=value: makeRightClickMenu(x))
 
     for i in range(0, len(Main.context['array'])):
         for j, value in enumerate(Main.context['array'][i]):
             label = tk.Label(Main.window, text=str(Main.context['array'][i][value]))
             label.grid(row=i + 1, column=j)
+            if type(Main.context['array'][i][value]) != str:
+                label.bind('<Button-3>', lambda e, x=value: makeRightClickMenu(x))
 
 
 def openFile():
@@ -76,28 +82,29 @@ def makeMenu():
     menubar.add_cascade(label="Edit", menu=editmenu)
 
 
+def makeRightClickMenu(column):
+    rightClickMenu = tk.Menu(Main.window, tearoff=0)
+    rightClickMenu.add_command(label="Show stats", command=lambda: showStats(column))
+    rightClickMenu.post(Main.window.winfo_pointerx(), Main.window.winfo_pointery())
+
+
 def initWindow():
     Main.window = OpenWindow('1000x500', 'Pyxcel')
     Main.context = {'array': [], 'sortKey': '', 'sortReverse': False, 'file': '', 'columns': []}
-    # Menu
-    makeMenu()
-
-    # Listbox
     displayArray()
-
     Main.window.mainloop()
 
 
 def clearWindow():
     # don t clear the menu
     for widget in Main.window.winfo_children():
-        if type(widget) != tk.Menu:
-            widget.destroy()
+        widget.destroy()
     Main.window.update()
 
 
 def displayArray():
     clearWindow()
+    makeMenu()
     if len(Main.context['array']) == 0:
         text = tk.Label(Main.window, text="No data to display")
         text.place(relx=0.5, rely=0.5, anchor='center')
@@ -127,3 +134,53 @@ def addRow():
     Main.context['array'].append({})
     print(Main.context['array'])
     displayArray()
+
+
+def showStats(column):
+    displayArray()
+    windowStats = OpenWindow('300x300', 'Stats')
+    # get type of column
+    typeStat = type(Main.context['array'][0][column])
+    if typeStat == int or typeStat == float:
+        min = Main.context['array'][0][column]
+        max = Main.context['array'][0][column]
+        avg = 0
+        for i in Main.context['array']:
+            if min > i[column]:
+                min = i[column]
+            if max < i[column]:
+                max = i[column]
+            avg += i[column]
+        avg /= len(Main.context['array'])
+        text = tk.Label(windowStats, text="Min : " + str(min) + "\nMax : " + str(max) + "\nAvg : " + str(avg))
+        text.place(relx=0.5, rely=0.5, anchor='center')
+        text.pack()
+        windowStats.mainloop()
+    elif typeStat == bool:
+        true = 0
+        false = 0
+        for i in Main.context['array']:
+            if i[column]:
+                true += 1
+            else:
+                false += 1
+        text = tk.Label(windowStats,
+                        text="True : " + str(true / len(Main.context['array']) * 100) + "%\nFalse : " + str(
+                            false / len(Main.context['array']) * 100) + "%")
+        text.place(relx=0.5, rely=0.5, anchor='center')
+        text.pack()
+        windowStats.mainloop()
+    elif typeStat == list:
+        min = len(Main.context['array'][0][column])
+        max = len(Main.context['array'][0][column])
+        avg = 0
+        for i in Main.context['array']:
+            if min > len(i[column]):
+                min = len(i[column])
+            if max < len(i[column]):
+                max = len(i[column])
+            avg += len(i[column])
+        avg /= len(Main.context['array'])
+        text = tk.Label(windowStats, text="Taille min : " + str(min) + "\nTaille max : " + str(max) + "\nTaille moyenne : " + str(avg))
+        text.place(relx=0.5, rely=0.5, anchor='center')
+        text.pack()
