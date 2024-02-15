@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 
-import FileParser
+import file_parser
 import Main
 
 
@@ -25,7 +25,7 @@ def updateContextOnCellChange(row, column, sv):
     sv: StringVar
         The value of the cell
     """
-    Main.context["array"][row][column] = FileParser.stringToTypeOfValue(sv.get())
+    Main.context["array"][row][column] = file_parser.stringToTypeOfValue(sv.get())
 
 
 def createTable():
@@ -83,20 +83,20 @@ def openFile():
         ext = file.name.split(".")[-1]
         Main.context["file"] = file.name
         if ext == "csv":
-            Main.context["array"] = FileParser.csvToArray(file.name)
+            Main.context["array"] = file_parser.csvToArray(file.name)
         elif ext == "json":
-            Main.context["array"] = FileParser.jsonFileToArray(file.name)
+            Main.context["array"] = file_parser.jsonFileToArray(file.name)
         elif ext == "xml":
-            Main.context["array"] = FileParser.xmlToArray(file.name)
+            Main.context["array"] = file_parser.xmlToArray(file.name)
         elif ext == "yaml":
-            Main.context["array"] = FileParser.yamlToArray(file.name)
+            Main.context["array"] = file_parser.yamlToArray(file.name)
         else:
             print("ERROR : File type not supported")
             Main.context["array"] = []
 
         Main.context["original"] = Main.context["array"]
 
-        FileParser.getColumns(Main.context)
+        file_parser.getColumns(Main.context)
         displayArray()
 
 
@@ -120,17 +120,17 @@ def saveAs():
 
     Main.context["file"] = file.name
     if ext == "csv":
-        FileParser.arrayToCsv(Main.context["array"], file.name)
+        file_parser.arrayToCsv(Main.context["array"], file.name)
     elif ext == "json":
-        FileParser.arrayToJson(Main.context["array"], file.name)
+        file_parser.arrayToJson(Main.context["array"], file.name)
     elif ext == "xml":
-        FileParser.arrayToXml(Main.context["array"], file.name)
+        file_parser.arrayToXml(Main.context["array"], file.name)
     elif ext == "yaml":
-        FileParser.arrayToYaml(Main.context["array"], file.name)
+        file_parser.arrayToYaml(Main.context["array"], file.name)
     else:
         print("ERROR : File type not supported")
         Main.context["array"] = []
-    FileParser.getColumns(Main.context)
+    file_parser.getColumns(Main.context)
     displayArray()
 
 
@@ -145,13 +145,13 @@ def save():
             row[key] = Main.context["cell_vars"][i][key].get()
 
     if ext == "csv":
-        FileParser.arrayToCsv(Main.context["array"], Main.context["file"])
+        file_parser.arrayToCsv(Main.context["array"], Main.context["file"])
     elif ext == "json":
-        FileParser.arrayToJson(Main.context["array"], Main.context["file"])
+        file_parser.arrayToJson(Main.context["array"], Main.context["file"])
     elif ext == "xml":
-        FileParser.arrayToXml(Main.context["array"], Main.context["file"])
+        file_parser.arrayToXml(Main.context["array"], Main.context["file"])
     elif ext == "yaml":
-        FileParser.arrayToYaml(Main.context["array"], Main.context["file"])
+        file_parser.arrayToYaml(Main.context["array"], Main.context["file"])
     else:
         print("ERROR : File type not supported")
 
