@@ -97,12 +97,3 @@ def yamlToArray(name):
 def arrayToYaml(array, name):
     with open(name, "w") as f:
         yaml.dump(array, f)
-
-
-def getColumns(array):
-    res = []
-    for i in array:
-        for j in i:
-            if j not in res:
-                res.append(j)
-    Main.context["columns"] = res
