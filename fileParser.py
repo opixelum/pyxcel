@@ -55,7 +55,7 @@ def arrayToCsv(array, name):
     for i in array:
         line = []
         for j in header:
-            if type(i[j]) == list:
+            if isinstance(i[j], list):
                 line.append(",".join([str(k) for k in i[j]]))
             else:
                 line.append(str(i[j]))
