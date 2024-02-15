@@ -11,9 +11,9 @@ def stringToTypeOfValue(string):
             return float(string)
         else:
             return int(string)
-    if string == 'True':
+    if string == 'True' or string == 'true':
         return True
-    if string == 'False':
+    if string == 'False' or string == 'false':
         return False
     return string
 
