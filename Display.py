@@ -78,6 +78,11 @@ def saveAs():
     if file is None:
         return
     ext = file.name.split(".")[-1]
+
+    for i, row in enumerate(Main.context["array"]):
+        for _, (key, _) in enumerate(row.items()):
+            row[key] = Main.context["cell_vars"][i][key].get()
+
     Main.context["file"] = file.name
     if ext == "csv":
         fileParser.arrayToCsv(Main.context["array"], file.name)
