@@ -11,10 +11,28 @@ def OpenWindow(size, title):
     return w
 
 
+def updateContextOnCellChange(row, column, sv):
+    """
+    Update the context array when a cell is modified
+
+    Parameters
+    ----------
+    row: int
+        The number of the cell's row
+    column: int
+        The number of the cell's column
+    sv: StringVar
+        The value of the cell
+    """
+    Main.context["array"][row][column] = sv.get()
+
+
 def createTable():
     numRows = max(len(Main.context["array"]) + 1, 10)
     numColumns = len(Main.context["array"][0])
-    Main.context["cell_vars"] = []  # Contains the value of each cell
+
+    # Contains the reference to each cell entry
+    Main.context["cell_vars"] = []
 
     for i in range(numColumns):
         Main.window.grid_columnconfigure(i, weight=1)
@@ -38,6 +56,13 @@ def createTable():
         row_vars = {}
         for j, (key, value) in enumerate(row.items()):
             cell_content = tk.StringVar(value=value)
+            cell_content.trace_add(
+                "write",
+                lambda *_,
+                row=i,
+                column=key,
+                sv=cell_content: updateContextOnCellChange(row, column, sv),
+            )
             cell = tk.Entry(Main.window, textvariable=cell_content)
             cell.grid(row=i + 1, column=j)
             row_vars[key] = cell_content
@@ -48,6 +73,7 @@ def createTable():
 def openFile():
     file = filedialog.askopenfile()
     Main.context = {
+        "original": [],
         "array": [],
         "sortKey": "",
         "sortReverse": False,
@@ -69,6 +95,9 @@ def openFile():
         else:
             print("ERROR : File type not supported")
             Main.context["array"] = []
+
+        Main.context["original"] = Main.context["array"]
+
         fileParser.getColumns(Main.context)
         displayArray()
 
