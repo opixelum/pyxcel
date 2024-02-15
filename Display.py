@@ -207,15 +207,7 @@ def showStats(column):
             if max < len(i[column]):
                 max = len(i[column])
             avg += len(i[column])
-        avg /= len(Main.context["array"])
-        text = tk.Label(
-            windowStats,
-            text="Taille min : "
-            + str(min)
-            + "\nTaille max : "
-            + str(max)
-            + "\nTaille moyenne : "
-            + str(avg),
-        )
-        text.place(relx=0.5, rely=0.5, anchor="center")
+        avg /= len(Main.context['array'])
+        text = tk.Label(windowStats, text="Min list size : " + str(min) + "\nMax list size: " + str(max) + "\nAvg list size: " + str(avg))
+        text.place(relx=0.5, rely=0.5, anchor='center')
         text.pack()

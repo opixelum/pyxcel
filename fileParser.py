@@ -39,85 +39,53 @@ def csvToArray(name):
                 break
 
             d = {}
-
-            for j, value in enumerate(i.split(";")):
-                d[header[j]] = stringToTypeOfValue(value)
-
+            for j, value in enumerate(i.split(';')):
+                if ',' in value:
+                    d[header[j]] = [stringToTypeOfValue(k) for k in value.split(',')]
+                else:
+                    d[header[j]] = stringToTypeOfValue(value)
             res.append(d)
 
         return res
 
 
-def isAllValue(array):
-    for i in array:
-        for j in i:
-            if isinstance(i[j], list) or isinstance(i[j], dict):
-                return False
-    return True
-
-
 def arrayToCsv(array, name):
     header = [i for i in array[0]]
-
-    if not isAllValue(array):
-        print("ERROR: Values cannot be a CSV file.")
-        return
-
-    csv_content = ";".join(header)
-
+    r = ';'.join(header)
     for i in array:
         line = []
-
         for j in header:
-            line.append(str(i[j]))
+            if type(i[j]) == list:
+                line.append(','.join([str(k) for k in i[j]]))
+            else:
+                line.append(str(i[j]))
+        r += '\n' + ';'.join(line)
+    with open(name, 'w') as f:
+        f.write(r)
 
-        csv_content += "\n" + ";".join(line)
 
-    with open(name, "w") as f:
-        f.write(csv_content)
-
-
-def recuXml(root):
-    d = {}
-    for i in root:
-        if len(i) == 0:
-            d[i.tag] = stringToTypeOfValue(i.text)
-        else:
-            d[i.tag] = recuXml(i)
-    return d
+def arrayToXml(array, name):
+    root = ET.Element('root')
+    for i in array:
+        child = ET.Element('row')
+        root.append(child)
+        for j in i:
+            child2 = ET.Element(j)
+            child2.text = str(i[j])
+            child.append(child2)
+    tree = ET.ElementTree(root)
+    tree.write(name)
 
 
 def xmlToArray(name):
-    tree = ET.parse(name)
-    root = tree.getroot()
+    root = ET.parse(name).getroot()
     res = []
     for i in root:
-        res.append(recuXml(i))
+        d = {}
+        for j in i:
+            d[j.tag] = stringToTypeOfValue(j.text)
+        res.append(d)
     return res
-
-
-def dictToXml(element, dictionary):
-    for key, value in dictionary.items():
-        subElement = ET.SubElement(element, key)
-        if isinstance(value, dict):
-            dictToXml(subElement, value)
-        else:
-            subElement.text = str(value)
-
-
-def arrayToXml(array, name, r="root"):
-    root = ET.Element(r)
-
-    for item in array:
-        dictToXml(root, item)
-
-    tree = ET.ElementTree(root)
-    saveXml(tree, name)
-
-
-def saveXml(tree, name):
-    with open(name, "wb") as f:
-        tree.write(f)
 
 
 def yamlToArray(name):
