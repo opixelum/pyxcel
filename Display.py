@@ -30,9 +30,9 @@ def createTable():
                 tmp += " ▲"
         label = tk.Label(Main.window, text=tmp)
         label.grid(row=0, column=i)
-        label.bind("<Button-1>", lambda e, x=header: sortArray(x))
-        if type(Main.context["array"][0][header]) != str:
-            label.bind("<Button-3>", lambda e, x=header: makeRightClickMenu(x))
+        label.bind("<Button-1>", lambda _, x=header: sortArray(x))
+        if not isinstance(Main.context["array"][0][header], str):
+            label.bind("<Button-3>", lambda _, x=header: makeRightClickMenu(x))
 
     for i, row in enumerate(Main.context["array"]):
         row_vars = {}
@@ -74,7 +74,15 @@ def openFile():
 
 
 def saveAs():
-    file = filedialog.asksaveasfile(defaultextension=".csv", filetypes=[("CSV files", "*.csv"), ("JSON files", "*.json"), ("XML files", "*.xml"), ("YAML files", "*.yaml")])
+    file = filedialog.asksaveasfile(
+        defaultextension=".csv",
+        filetypes=[
+            ("CSV files", "*.csv"),
+            ("JSON files", "*.json"),
+            ("XML files", "*.xml"),
+            ("YAML files", "*.yaml"),
+        ],
+    )
     if file is None:
         return
     ext = file.name.split(".")[-1]
@@ -157,7 +165,7 @@ def initWindow():
         "columns": [],
     }
     # put save if ctrl + s is pressed
-    Main.window.bind("<Control-s>", lambda e: save())
+    Main.window.bind("<Control-s>", lambda _: save())
     displayArray()
     Main.window.mainloop()
 
@@ -257,7 +265,15 @@ def showStats(column):
             if max < len(i[column]):
                 max = len(i[column])
             avg += len(i[column])
-        avg /= len(Main.context['array'])
-        text = tk.Label(windowStats, text="Min list size : " + str(min) + "\nMax list size: " + str(max) + "\nAvg list size: " + str(avg))
-        text.place(relx=0.5, rely=0.5, anchor='center')
+        avg /= len(Main.context["array"])
+        text = tk.Label(
+            windowStats,
+            text="Min list size : "
+            + str(min)
+            + "\nMax list size: "
+            + str(max)
+            + "\nAvg list size: "
+            + str(avg),
+        )
+        text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()

@@ -10,9 +10,9 @@ def stringToTypeOfValue(string):
             return float(string)
         else:
             return int(string)
-    if string == 'True' or string == 'true':
+    if string == "True" or string == "true":
         return True
-    if string == 'False' or string == 'false':
+    if string == "False" or string == "false":
         return False
     return string
 
@@ -39,9 +39,9 @@ def csvToArray(name):
                 break
 
             d = {}
-            for j, value in enumerate(i.split(';')):
-                if ',' in value:
-                    d[header[j]] = [stringToTypeOfValue(k) for k in value.split(',')]
+            for j, value in enumerate(i.split(";")):
+                if "," in value:
+                    d[header[j]] = [stringToTypeOfValue(k) for k in value.split(",")]
                 else:
                     d[header[j]] = stringToTypeOfValue(value)
             res.append(d)
@@ -51,23 +51,23 @@ def csvToArray(name):
 
 def arrayToCsv(array, name):
     header = [i for i in array[0]]
-    r = ';'.join(header)
+    r = ";".join(header)
     for i in array:
         line = []
         for j in header:
             if type(i[j]) == list:
-                line.append(','.join([str(k) for k in i[j]]))
+                line.append(",".join([str(k) for k in i[j]]))
             else:
                 line.append(str(i[j]))
-        r += '\n' + ';'.join(line)
-    with open(name, 'w') as f:
+        r += "\n" + ";".join(line)
+    with open(name, "w") as f:
         f.write(r)
 
 
 def arrayToXml(array, name):
-    root = ET.Element('root')
+    root = ET.Element("root")
     for i in array:
-        child = ET.Element('row')
+        child = ET.Element("row")
         root.append(child)
         for j in i:
             child2 = ET.Element(j)
