@@ -24,7 +24,7 @@ def updateContextOnCellChange(row, column, sv):
     sv: StringVar
         The value of the cell
     """
-    Main.context["array"][row][column] = sv.get()
+    Main.context["array"][row][column] = fileParser.stringToTypeOfValue(sv.get())
 
 
 def createTable():
