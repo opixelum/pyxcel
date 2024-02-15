@@ -13,21 +13,45 @@ def OpenWindow(size, title):
 
 def updateContextOnCellChange(row, column, sv):
     """
-    Update the context array when a cell is modified
+    Updates the context array when a cell is modified.
 
     Parameters
     ----------
     row: int
-        The number of the cell's row
+        The number of the cell's row.
     column: int
-        The number of the cell's column
+        The number of the cell's column.
     sv: StringVar
-        The value of the cell
+        The value of the cell.
     """
+    print(Main.context["array"], Main.context["original"])
     Main.context["array"][row][column] = fileParser.stringToTypeOfValue(sv.get())
+    print(Main.context["array"], Main.context["original"])
+
+
+def revertToOriginal():
+    """
+    Reverts the array to its original state (before any modification).
+    """
+    # get type of file csv, json, xml, yaml
+    print(Main.context)
+    ext = Main.context["file"].split(".")[-1]
+    Main.context["file"] = Main.context["file"]
+    if ext == "csv":
+        Main.context["array"] = fileParser.csvToArray(Main.context["file"])
+    elif ext == "json":
+        Main.context["array"] = fileParser.jsonFileToArray(Main.context["file"])
+    elif ext == "xml":
+        Main.context["array"] = fileParser.xmlToArray(Main.context["file"])
+    elif ext == "yaml":
+        Main.context["array"] = fileParser.yamlToArray(Main.context["file"])
+    displayArray()
 
 
 def createTable():
+    # copy the original array to be able to revert to it without linking the two arrays
+    Main.context["original"] = Main.context["array"].copy()
+
     numRows = max(len(Main.context["array"]) + 1, 10)
     numColumns = len(Main.context["array"][0])
 
@@ -78,7 +102,6 @@ def openFile():
         "sortKey": "",
         "sortReverse": False,
         "file": "",
-        "columns": [],
     }
     if file:
         # get type of file csv, json, xml, yaml
@@ -95,10 +118,6 @@ def openFile():
         else:
             print("ERROR : File type not supported")
             Main.context["array"] = []
-
-        Main.context["original"] = Main.context["array"]
-
-        fileParser.getColumns(Main.context)
         displayArray()
 
 
@@ -132,7 +151,6 @@ def saveAs():
     else:
         print("ERROR : File type not supported")
         Main.context["array"] = []
-    fileParser.getColumns(Main.context)
     displayArray()
 
 
@@ -173,6 +191,7 @@ def makeMenu():
     sortmenu.add_command(label="reset", command=lambda: resetSort())
     menubar.add_cascade(label="Sort", menu=sortmenu)
     editmenu = tk.Menu(menubar, tearoff=0)
+    editmenu.add_command(label="Revert to original", command=lambda: revertToOriginal())
     editmenu.add_command(label="Add column", command=lambda: print("Add column"))
     editmenu.add_command(label="Add row", command=lambda: addRow())
     menubar.add_cascade(label="Edit", menu=editmenu)
@@ -190,8 +209,7 @@ def initWindow():
         "array": [],
         "sortKey": "",
         "sortReverse": False,
-        "file": "",
-        "columns": [],
+        "file": ""
     }
     # put save if ctrl + s is pressed
     Main.window.bind("<Control-s>", lambda _: save())
