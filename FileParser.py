@@ -1,9 +1,7 @@
 import json
-import xml.etree.ElementTree as ET
-
-import yaml
-
 import main
+import xml.etree.ElementTree as ET
+import yaml
 
 
 def stringToTypeOfValue(string):
