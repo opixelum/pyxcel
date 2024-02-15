@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
-import fileParser
+
+import FileParser
 import Main
 
 
@@ -24,7 +25,7 @@ def updateContextOnCellChange(row, column, sv):
     sv: StringVar
         The value of the cell
     """
-    Main.context["array"][row][column] = fileParser.stringToTypeOfValue(sv.get())
+    Main.context["array"][row][column] = FileParser.stringToTypeOfValue(sv.get())
 
 
 def createTable():
@@ -58,10 +59,7 @@ def createTable():
             cell_content = tk.StringVar(value=value)
             cell_content.trace_add(
                 "write",
-                lambda *_,
-                row=i,
-                column=key,
-                sv=cell_content: updateContextOnCellChange(row, column, sv),
+                lambda *_, row=i, column=key, sv=cell_content: updateContextOnCellChange(row, column, sv),
             )
             cell = tk.Entry(Main.window, textvariable=cell_content)
             cell.grid(row=i + 1, column=j)
@@ -85,20 +83,20 @@ def openFile():
         ext = file.name.split(".")[-1]
         Main.context["file"] = file.name
         if ext == "csv":
-            Main.context["array"] = fileParser.csvToArray(file.name)
+            Main.context["array"] = FileParser.csvToArray(file.name)
         elif ext == "json":
-            Main.context["array"] = fileParser.jsonFileToArray(file.name)
+            Main.context["array"] = FileParser.jsonFileToArray(file.name)
         elif ext == "xml":
-            Main.context["array"] = fileParser.xmlToArray(file.name)
+            Main.context["array"] = FileParser.xmlToArray(file.name)
         elif ext == "yaml":
-            Main.context["array"] = fileParser.yamlToArray(file.name)
+            Main.context["array"] = FileParser.yamlToArray(file.name)
         else:
             print("ERROR : File type not supported")
             Main.context["array"] = []
 
         Main.context["original"] = Main.context["array"]
 
-        fileParser.getColumns(Main.context)
+        FileParser.getColumns(Main.context)
         displayArray()
 
 
@@ -122,17 +120,17 @@ def saveAs():
 
     Main.context["file"] = file.name
     if ext == "csv":
-        fileParser.arrayToCsv(Main.context["array"], file.name)
+        FileParser.arrayToCsv(Main.context["array"], file.name)
     elif ext == "json":
-        fileParser.arrayToJson(Main.context["array"], file.name)
+        FileParser.arrayToJson(Main.context["array"], file.name)
     elif ext == "xml":
-        fileParser.arrayToXml(Main.context["array"], file.name)
+        FileParser.arrayToXml(Main.context["array"], file.name)
     elif ext == "yaml":
-        fileParser.arrayToYaml(Main.context["array"], file.name)
+        FileParser.arrayToYaml(Main.context["array"], file.name)
     else:
         print("ERROR : File type not supported")
         Main.context["array"] = []
-    fileParser.getColumns(Main.context)
+    FileParser.getColumns(Main.context)
     displayArray()
 
 
@@ -147,13 +145,13 @@ def save():
             row[key] = Main.context["cell_vars"][i][key].get()
 
     if ext == "csv":
-        fileParser.arrayToCsv(Main.context["array"], Main.context["file"])
+        FileParser.arrayToCsv(Main.context["array"], Main.context["file"])
     elif ext == "json":
-        fileParser.arrayToJson(Main.context["array"], Main.context["file"])
+        FileParser.arrayToJson(Main.context["array"], Main.context["file"])
     elif ext == "xml":
-        fileParser.arrayToXml(Main.context["array"], Main.context["file"])
+        FileParser.arrayToXml(Main.context["array"], Main.context["file"])
     elif ext == "yaml":
-        fileParser.arrayToYaml(Main.context["array"], Main.context["file"])
+        FileParser.arrayToYaml(Main.context["array"], Main.context["file"])
     else:
         print("ERROR : File type not supported")
 
@@ -219,9 +217,7 @@ def displayArray():
 
 def sortArray(column):
     if Main.context["sortKey"] == column:
-        Main.context["array"].sort(
-            key=lambda x: x[column], reverse=not Main.context["sortReverse"]
-        )
+        Main.context["array"].sort(key=lambda x: x[column], reverse=not Main.context["sortReverse"])
         Main.context["sortReverse"] = not Main.context["sortReverse"]
     else:
         Main.context["array"].sort(key=lambda x: x[column])
@@ -275,11 +271,7 @@ def showStats(column):
                 false += 1
         text = tk.Label(
             windowStats,
-            text="True : "
-            + str(true / len(Main.context["array"]) * 100)
-            + "%\nFalse : "
-            + str(false / len(Main.context["array"]) * 100)
-            + "%",
+            text="True : " + str(true / len(Main.context["array"]) * 100) + "%\nFalse : " + str(false / len(Main.context["array"]) * 100) + "%",
         )
         text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
@@ -297,12 +289,7 @@ def showStats(column):
         avg /= len(Main.context["array"])
         text = tk.Label(
             windowStats,
-            text="Min list size : "
-            + str(min)
-            + "\nMax list size: "
-            + str(max)
-            + "\nAvg list size: "
-            + str(avg),
+            text="Min list size : " + str(min) + "\nMax list size: " + str(max) + "\nAvg list size: " + str(avg),
         )
         text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
