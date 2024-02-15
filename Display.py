@@ -237,8 +237,8 @@ def resetSort():
 
 
 def addRow():
-    Main.context["array"].append({})
-    print(Main.context["array"])
+    """Adds a row to the table"""
+    Main.context["array"].append({key: "" for key in Main.context["array"][0]})
     displayArray()
 
 
