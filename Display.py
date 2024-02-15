@@ -73,14 +73,57 @@ def openFile():
         displayArray()
 
 
+def saveAs():
+    file = filedialog.asksaveasfile(defaultextension=".csv", filetypes=[("CSV files", "*.csv"), ("JSON files", "*.json"), ("XML files", "*.xml"), ("YAML files", "*.yaml")])
+    if file is None:
+        return
+    ext = file.name.split(".")[-1]
+    Main.context["file"] = file.name
+    if ext == "csv":
+        fileParser.arrayToCsv(Main.context["array"], file.name)
+    elif ext == "json":
+        fileParser.arrayToJson(Main.context["array"], file.name)
+    elif ext == "xml":
+        fileParser.arrayToXml(Main.context["array"], file.name)
+    elif ext == "yaml":
+        fileParser.arrayToYaml(Main.context["array"], file.name)
+    else:
+        print("ERROR : File type not supported")
+        Main.context["array"] = []
+    fileParser.getColumns(Main.context)
+    displayArray()
+
+
+def save():
+    if Main.context["file"] == "":
+        saveAs()
+        return
+    ext = Main.context["file"].split(".")[-1]
+
+    for i, row in enumerate(Main.context["array"]):
+        for _, (key, _) in enumerate(row.items()):
+            row[key] = Main.context["cell_vars"][i][key].get()
+
+    if ext == "csv":
+        fileParser.arrayToCsv(Main.context["array"], Main.context["file"])
+    elif ext == "json":
+        fileParser.arrayToJson(Main.context["array"], Main.context["file"])
+    elif ext == "xml":
+        fileParser.arrayToXml(Main.context["array"], Main.context["file"])
+    elif ext == "yaml":
+        fileParser.arrayToYaml(Main.context["array"], Main.context["file"])
+    else:
+        print("ERROR : File type not supported")
+
+
 def makeMenu():
     menubar = tk.Menu(Main.window)
     Main.window.config(menu=menubar)
     filemenu = tk.Menu(menubar, tearoff=0)
     filemenu.add_command(label="New", command=lambda: print("New"))
     filemenu.add_command(label="Open", command=lambda: openFile())
-    filemenu.add_command(label="Save", command=lambda: fileParser.save())
-    filemenu.add_command(label="Save as...", command=lambda: print("Save as..."))
+    filemenu.add_command(label="Save", command=lambda: save())
+    filemenu.add_command(label="Save as...", command=lambda: saveAs())
     filemenu.add_separator()
     filemenu.add_command(label="Exit", command=Main.window.quit)
     menubar.add_cascade(label="File", menu=filemenu)
@@ -108,6 +151,8 @@ def initWindow():
         "file": "",
         "columns": [],
     }
+    # put save if ctrl + s is pressed
+    Main.window.bind("<Control-s>", lambda e: save())
     displayArray()
     Main.window.mainloop()
 
