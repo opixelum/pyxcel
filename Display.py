@@ -48,10 +48,9 @@ def createTable():
         #    else:
         #        tmp += " ▲"
         header_sv = tk.StringVar(value=tmp)
-        label = tk.Entry(Main.window, textvariable=header_sv)
-        label.grid(row=0, column=i)
-        if not isinstance(Main.context["array"][0][header], str):
-            label.bind("<Button-3>", lambda _, x=header: makeRightClickMenu(x))
+        header_entry = tk.Entry(Main.window, textvariable=header_sv)
+        header_entry.grid(row=0, column=i)
+        header_entry.bind("<Button-3>", lambda _, x=header: makeRightClickMenu(x))
 
     for i, row in enumerate(Main.context["array"]):
         row_vars = {}
@@ -291,7 +290,7 @@ def showStats(column):
         text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
         windowStats.mainloop()
-    elif typeStat == list:
+    elif typeStat == list or typeStat == str:
         min = len(Main.context["array"][0][column])
         max = len(Main.context["array"][0][column])
         avg = 0
@@ -302,14 +301,16 @@ def showStats(column):
                 max = len(i[column])
             avg += len(i[column])
         avg /= len(Main.context["array"])
-        text = tk.Label(
-            windowStats,
-            text="Min list size : "
-            + str(min)
-            + "\nMax list size: "
-            + str(max)
-            + "\nAvg list size: "
-            + str(avg),
+        min_text = (
+            "Min " + ("list" if typeStat == list else "string ") + "size: " + str(min)
         )
+        max_text = (
+            "\nMax " + ("list" if typeStat == list else "string ") + "size: " + str(max)
+        )
+        avg_text = (
+            "\nAvg " + ("list" if typeStat == list else "string ") + "size: " + str(avg)
+        )
+        text = tk.Label(windowStats, text=min_text + max_text + avg_text)
         text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
+        windowStats.mainloop()
