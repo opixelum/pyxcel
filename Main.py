@@ -1,5 +1,4 @@
 import Display
-import fileParser
 
 global window
 global context

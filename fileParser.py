@@ -1,13 +1,12 @@
 import json
+import Main
 import xml.etree.ElementTree as ET
 import yaml
-
-import Main
 
 
 def stringToTypeOfValue(string):
     if string.isdigit():
-        if '.' in string:
+        if "." in string:
             return float(string)
         else:
             return int(string)
@@ -19,50 +18,63 @@ def stringToTypeOfValue(string):
 
 
 def jsonFileToArray(name):
-    with open(name, 'r') as f:
+    with open(name, "r") as f:
         return json.load(f)
 
 
 def arrayToJson(arr, name):
-    with open(name, 'w') as f:
+    with open(name, "w") as f:
         json.dump(arr, f)
 
 
 def csvToArray(name):
     res = []
-    with open(name, 'r') as f:
-        t = f.read().split('\n')
-        l = t[0].split(';')
+
+    with open(name, "r") as f:
+        t = f.read().split("\n")
+        header = t[0].split(";")
+
         for i in t[1:]:
-            if i == '': break
+            if i == "":
+                break
+
             d = {}
-            for j, value in enumerate(i.split(';')):
-                d[l[j]] = stringToTypeOfValue(value)
+
+            for j, value in enumerate(i.split(";")):
+                d[header[j]] = stringToTypeOfValue(value)
+
             res.append(d)
+
         return res
 
 
 def isAllValue(array):
     for i in array:
         for j in i:
-            if type(i[j]) == list or type(i[j]) == dict:
+            if isinstance(i[j], list) or isinstance(i[j], dict):
                 return False
     return True
 
 
 def arrayToCsv(array, name):
-    l = [i for i in array[0]]
+    header = [i for i in array[0]]
+
     if not isAllValue(array):
-        print("ERROR : Values can't be a csv file")
+        print("ERROR: Values cannot be a CSV file.")
         return
-    r = ';'.join(l)
+
+    csv_content = ";".join(header)
+
     for i in array:
         line = []
-        for j in l:
+
+        for j in header:
             line.append(str(i[j]))
-        r += '\n' + ';'.join(line)
-    with open(name, 'w') as f:
-        f.write(r)
+
+        csv_content += "\n" + ";".join(line)
+
+    with open(name, "w") as f:
+        f.write(csv_content)
 
 
 def recuXml(root):
@@ -93,7 +105,7 @@ def dictToXml(element, dictionary):
             subElement.text = str(value)
 
 
-def arrayToXml(array, name, r='root'):
+def arrayToXml(array, name, r="root"):
     root = ET.Element(r)
 
     for item in array:
@@ -104,19 +116,20 @@ def arrayToXml(array, name, r='root'):
 
 
 def saveXml(tree, name):
-    with open(name, 'wb') as f:
+    with open(name, "wb") as f:
         tree.write(f)
 
 
 def yamlToArray(name):
-    with open(name, 'r') as f:
+    with open(name, "r") as f:
         arr = yaml.safe_load(f)
     return arr
 
 
 def arrayToYaml(array, name):
-    with open(name, 'w') as f:
+    with open(name, "w") as f:
         yaml.dump(array, f)
+
 
 def getColumns(array):
     res = []
@@ -124,22 +137,29 @@ def getColumns(array):
         for j in i:
             if j not in res:
                 res.append(j)
-    Main.context['columns'] = res
+    Main.context["columns"] = res
 
 
 def save():
-    if Main.context['file'] == '':
-        print('ERROR : No file to save')
-        # change by saveAs
+    if Main.context["file"] == "":
+        print("ERROR : No file to save")
+        # TODO: change by saveAs
         return
-    ext = Main.context['file'].split('.')[-1]
-    if ext == 'csv':
-        arrayToCsv(Main.context['array'], Main.context['file'])
-    elif ext == 'json':
-        arrayToJson(Main.context['array'], Main.context['file'])
-    elif ext == 'xml':
-        arrayToXml(Main.context['array'], Main.context['file'])
-    elif ext == 'yaml':
-        arrayToYaml(Main.context['array'], Main.context['file'])
+
+    ext = Main.context["file"].split(".")[-1]
+
+    # Save the content of the cells in the array
+    for i, row in enumerate(Main.context["array"]):
+        for _, (key, _) in enumerate(row.items()):
+            row[key] = Main.context["cell_vars"][i][key].get()
+
+    if ext == "csv":
+        arrayToCsv(Main.context["array"], Main.context["file"])
+    elif ext == "json":
+        arrayToJson(Main.context["array"], Main.context["file"])
+    elif ext == "xml":
+        arrayToXml(Main.context["array"], Main.context["file"])
+    elif ext == "yaml":
+        arrayToYaml(Main.context["array"], Main.context["file"])
     else:
-        print('ERROR : File type not supported')
+        print("ERROR : File type not supported")
