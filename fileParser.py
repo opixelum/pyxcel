@@ -106,28 +106,3 @@ def getColumns(array):
             if j not in res:
                 res.append(j)
     Main.context["columns"] = res
-
-
-def save():
-    if Main.context["file"] == "":
-        print("ERROR : No file to save")
-        # TODO: change by saveAs
-        return
-
-    ext = Main.context["file"].split(".")[-1]
-
-    # Save the content of the cells in the array
-    for i, row in enumerate(Main.context["array"]):
-        for _, (key, _) in enumerate(row.items()):
-            row[key] = Main.context["cell_vars"][i][key].get()
-
-    if ext == "csv":
-        arrayToCsv(Main.context["array"], Main.context["file"])
-    elif ext == "json":
-        arrayToJson(Main.context["array"], Main.context["file"])
-    elif ext == "xml":
-        arrayToXml(Main.context["array"], Main.context["file"])
-    elif ext == "yaml":
-        arrayToYaml(Main.context["array"], Main.context["file"])
-    else:
-        print("ERROR : File type not supported")
