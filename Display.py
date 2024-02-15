@@ -302,13 +302,13 @@ def showStats(column):
             avg += len(i[column])
         avg /= len(Main.context["array"])
         min_text = (
-            "Min " + ("list" if typeStat == list else "string ") + "size: " + str(min)
+            "Min " + ("list" if typeStat == list else "string") + " size: " + str(min)
         )
         max_text = (
-            "\nMax " + ("list" if typeStat == list else "string ") + "size: " + str(max)
+            "\nMax " + ("list" if typeStat == list else "string") + " size: " + str(max)
         )
         avg_text = (
-            "\nAvg " + ("list" if typeStat == list else "string ") + "size: " + str(avg)
+            "\nAvg " + ("list" if typeStat == list else "string") + " size: " + str(avg)
         )
         text = tk.Label(windowStats, text=min_text + max_text + avg_text)
         text.place(relx=0.5, rely=0.5, anchor="center")
