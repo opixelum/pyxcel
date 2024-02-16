@@ -186,7 +186,7 @@ def makeMenu():
     Main.window.config(menu=menubar)
 
     filemenu = tk.Menu(menubar, tearoff=0)
-    filemenu.add_command(label="New", command=lambda: print("New"))
+    filemenu.add_command(label="New", command=lambda: newFile())
     filemenu.add_command(label="Open...", command=lambda: openFile())
     filemenu.add_command(label="Save", command=lambda: save())
     filemenu.add_command(label="Save As...", command=lambda: saveAs())
@@ -381,4 +381,14 @@ def deleteRow(row_number):
 def deleteColumn(header):
     for row in Main.context["array"]:
         row.pop(header)
+    displayArray()
+
+
+def newFile():
+    Main.context = {
+        "array": [{"new_column": ""}],
+        "sortKey": "",
+        "sortReverse": False,
+        "file": "",
+    }
     displayArray()
