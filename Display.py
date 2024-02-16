@@ -4,7 +4,7 @@ import fileParser
 import Main
 
 
-def OpenWindow(size, title):
+def open_window(size, title):
     w = tk.Tk()
     w.geometry(size)
     w.title(title)
@@ -15,7 +15,7 @@ def update_value(row_number, column_name, value_string_var):
     Main.context["data"][row_number][column_name] = value_string_var.get()
 
 
-def revertToOriginal():
+def revert_to_original():
     """
     Reverts the array to its original state (before any modification).
     """
@@ -23,17 +23,17 @@ def revertToOriginal():
     ext = Main.context["file"].split(".")[-1]
     Main.context["file"] = Main.context["file"]
     if ext == "csv":
-        Main.context["data"] = fileParser.csvToArray(Main.context["file"])
+        Main.context["data"] = fileParser.csv_to_data(Main.context["file"])
     elif ext == "json":
-        Main.context["data"] = fileParser.jsonFileToArray(Main.context["file"])
+        Main.context["data"] = fileParser.json_to_data(Main.context["file"])
     elif ext == "xml":
-        Main.context["data"] = fileParser.xmlToArray(Main.context["file"])
+        Main.context["data"] = fileParser.xml_to_data(Main.context["file"])
     elif ext == "yaml":
-        Main.context["data"] = fileParser.yamlToArray(Main.context["file"])
-    displayArray()
+        Main.context["data"] = fileParser.yaml_to_data(Main.context["file"])
+    display_data()
 
 
-def createTable():
+def create_table():
     numRows = max(len(Main.context["data"]) + 1, 10)
     numColumns = len(Main.context["data"][0])
 
@@ -48,13 +48,13 @@ def createTable():
         header_entry = tk.Entry(Main.window, textvariable=header_sv)
         header_entry.bind(
             "<FocusOut>",
-            lambda *_, previous=column_name, sv=header_sv,: updateHeaderCellOnFocusOut(
+            lambda *_, previous=column_name, sv=header_sv,: update_column_name(
                 previous, sv
             ),
         )
         header_entry.grid(row=0, column=column_number)
         header_entry.bind(
-            "<Button-3>", lambda _, x=column_name: headerRightClickMenu(x)
+            "<Button-3>", lambda _, x=column_name: column_name_right_click_menu(x)
         )
 
     for row_number, row in enumerate(Main.context["data"]):
@@ -71,11 +71,11 @@ def createTable():
             cell.grid(row=row_number + 1, column=column_number)
             cell.bind(
                 "<Button-3>",
-                lambda _, x=column_name, row=row_number: cellRightClickMenu(x, row),
+                lambda _, x=column_name, row=row_number: value_right_click_menu(x, row),
             )
 
 
-def openFile():
+def open_file():
     file = filedialog.askopenfile()
     Main.context = {
         "data": [],
@@ -88,20 +88,20 @@ def openFile():
         ext = file.name.split(".")[-1]
         Main.context["file"] = file.name
         if ext == "csv":
-            Main.context["data"] = fileParser.csvToArray(file.name)
+            Main.context["data"] = fileParser.csv_to_data(file.name)
         elif ext == "json":
-            Main.context["data"] = fileParser.jsonFileToArray(file.name)
+            Main.context["data"] = fileParser.json_to_data(file.name)
         elif ext == "xml":
-            Main.context["data"] = fileParser.xmlToArray(file.name)
+            Main.context["data"] = fileParser.xml_to_data(file.name)
         elif ext == "yaml":
-            Main.context["data"] = fileParser.yamlToArray(file.name)
+            Main.context["data"] = fileParser.yaml_to_data(file.name)
         else:
             print("ERROR : File type not supported")
             Main.context["data"] = []
-        displayArray()
+        display_data()
 
 
-def saveAs():
+def save_as():
     file = filedialog.asksaveasfile(
         defaultextension=".csv",
         filetypes=[
@@ -131,12 +131,12 @@ def saveAs():
     else:
         print("ERROR : File type not supported")
         Main.context["data"] = []
-    displayArray()
+    display_data()
 
 
 def save():
     if Main.context["file"] == "":
-        saveAs()
+        save_as()
         return
     ext = Main.context["file"].split(".")[-1]
 
@@ -156,80 +156,82 @@ def save():
         print("ERROR : File type not supported")
 
 
-def makeMenu():
+def create_menus():
     menubar = tk.Menu(Main.window)
     Main.window.config(menu=menubar)
 
     filemenu = tk.Menu(menubar, tearoff=0)
-    filemenu.add_command(label="New", command=lambda: newFile())
-    filemenu.add_command(label="Open...", command=lambda: openFile())
+    filemenu.add_command(label="New", command=lambda: new_file())
+    filemenu.add_command(label="Open...", command=lambda: open_file())
     filemenu.add_command(label="Save", command=lambda: save())
-    filemenu.add_command(label="Save As...", command=lambda: saveAs())
+    filemenu.add_command(label="Save As...", command=lambda: save_as())
     filemenu.add_separator()
     filemenu.add_command(label="Exit Pyxcel", command=Main.window.quit)
     menubar.add_cascade(label="File", menu=filemenu)
 
     sortmenu = tk.Menu(menubar, tearoff=0)
-    sortmenu.add_command(label="Reset", command=lambda: resetSort())
+    sortmenu.add_command(label="Reset", command=lambda: reset_sort())
     menubar.add_cascade(label="Sort", menu=sortmenu)
 
     editmenu = tk.Menu(menubar, tearoff=0)
-    editmenu.add_command(label="Revert to Original", command=lambda: revertToOriginal())
-    editmenu.add_command(label="Add Row", command=lambda: addRow())
-    editmenu.add_command(label="Add Column", command=lambda: addColumn())
+    editmenu.add_command(
+        label="Revert to Original", command=lambda: revert_to_original()
+    )
+    editmenu.add_command(label="Add Row", command=lambda: add_row())
+    editmenu.add_command(label="Add Column", command=lambda: add_column())
     menubar.add_cascade(label="Edit", menu=editmenu)
 
 
-def headerRightClickMenu(header):
+def column_name_right_click_menu(header):
     rightClickMenu = tk.Menu(Main.window, tearoff=0)
-    rightClickMenu.add_command(label="Show Stats", command=lambda: showStats(header))
-    rightClickMenu.add_command(label="Sort", command=lambda: sortArray(header))
+    rightClickMenu.add_command(label="Show Stats", command=lambda: show_stats(header))
+    rightClickMenu.add_command(label="Sort", command=lambda: sort_data(header))
     rightClickMenu.add_command(
-        label="Delete Column", command=lambda: deleteColumn(header)
+        label="Delete Column", command=lambda: delete_column(header)
     )
     rightClickMenu.post(Main.window.winfo_pointerx(), Main.window.winfo_pointery())
 
 
-def cellRightClickMenu(header, row_number):
+def value_right_click_menu(header, row_number):
     rightClickMenu = tk.Menu(Main.window, tearoff=0)
-    rightClickMenu.add_command(label="Show Stats", command=lambda: showStats(header))
-    rightClickMenu.add_command(label="Sort", command=lambda: sortArray(header))
+    rightClickMenu.add_command(label="Show Stats", command=lambda: show_stats(header))
+    rightClickMenu.add_command(label="Sort", command=lambda: sort_data(header))
     rightClickMenu.add_command(
-        label="Delete Row", command=lambda: deleteRow(row_number)
+        label="Delete Row", command=lambda: delete_row(row_number)
     )
     rightClickMenu.add_command(
-        label="Delete Column", command=lambda: deleteColumn(header)
+        label="Delete Column", command=lambda: delete_column(header)
     )
     rightClickMenu.post(Main.window.winfo_pointerx(), Main.window.winfo_pointery())
 
 
-def initWindow():
-    Main.window = OpenWindow("1000x500", "Pyxcel")
+def init_window():
+    Main.window = open_window("1000x500", "Pyxcel")
     Main.context = {"data": [], "sortKey": "", "sortReverse": False, "file": ""}
     # put save if ctrl + s is pressed
     Main.window.bind("<Control-s>", lambda _: save())
-    displayArray()
+    display_data()
     Main.window.mainloop()
 
 
-def clearWindow():
+def clear_window():
     for widget in Main.window.winfo_children():
         widget.destroy()
     Main.window.update()
 
 
-def displayArray():
-    clearWindow()
-    makeMenu()
+def display_data():
+    clear_window()
+    create_menus()
     if len(Main.context["data"]) == 0:
         text = tk.Label(Main.window, text="No data to display.")
         text.place(relx=0.5, rely=0.5, anchor="center")
     else:
-        createTable()
+        create_table()
     Main.window.update()
 
 
-def sortArray(column):
+def sort_data(column):
     if Main.context["sortKey"] == column:
         Main.context["data"].sort(
             key=lambda x: x[column], reverse=not Main.context["sortReverse"]
@@ -239,20 +241,20 @@ def sortArray(column):
         Main.context["data"].sort(key=lambda x: x[column])
         Main.context["sortReverse"] = False
     Main.context["sortKey"] = column
-    displayArray()
+    display_data()
 
 
-def resetSort():
+def reset_sort():
     Main.context["sortKey"] = ""
     Main.context["sortReverse"] = False
-    displayArray()
+    display_data()
 
 
-def showStats(column):
-    displayArray()
-    windowStats = OpenWindow("300x300", "Stats")
+def show_stats(column):
+    display_data()
+    windowStats = open_window("300x300", "Stats")
     # get type of column
-    typeStat = fileParser.columnType(Main.context["data"], column)
+    typeStat = fileParser.column_type(Main.context["data"], column)
     print(typeStat)
     if typeStat == int or typeStat == float:
         min = Main.context["data"][0][column]
@@ -317,20 +319,20 @@ def showStats(column):
         windowStats.mainloop()
 
 
-def addRow():
+def add_row():
     """Adds a row to the table."""
     Main.context["data"].append({key: "" for key in Main.context["data"][0]})
-    displayArray()
+    display_data()
 
 
-def addColumn():
+def add_column():
     """Adds a column to the table."""
     for row in Main.context["data"]:
         row["new_column"] = ""
-    displayArray()
+    display_data()
 
 
-def updateHeaderCellOnFocusOut(previous, sv):
+def update_column_name(previous, sv):
     """
     Updates the context array when a header cell is modified.
 
@@ -345,25 +347,25 @@ def updateHeaderCellOnFocusOut(previous, sv):
         row[sv.get()] = row.pop(previous)
 
     # Need to update the header name on the frontend
-    displayArray()
+    display_data()
 
 
-def deleteRow(row_number):
+def delete_row(row_number):
     Main.context["data"].pop(row_number)
-    displayArray()
+    display_data()
 
 
-def deleteColumn(header):
+def delete_column(header):
     for row in Main.context["data"]:
         row.pop(header)
-    displayArray()
+    display_data()
 
 
-def newFile():
+def new_file():
     Main.context = {
         "data": [{"New column": ""}],
         "sortKey": "",
         "sortReverse": False,
         "file": "",
     }
-    displayArray()
+    display_data()

@@ -4,4 +4,4 @@ global window
 global context
 
 if __name__ == "__main__":
-    Display.initWindow()
+    Display.init_window()
