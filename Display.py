@@ -244,7 +244,6 @@ def initWindow():
 
 
 def clearWindow():
-    # don t clear the menu
     for widget in Main.window.winfo_children():
         widget.destroy()
     Main.window.update()
