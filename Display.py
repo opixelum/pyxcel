@@ -24,7 +24,10 @@ def updateContextOnCellChange(row, column, sv):
     sv: StringVar
         The value of the cell.
     """
-    Main.context["array"][row][column] = fileParser.stringToTypeOfValue(sv.get())
+    for i, row in enumerate(Main.context["array"]):
+        for _, (key, _) in enumerate(row.items()):
+            row[key] = Main.context["cell_vars"][i][key].get()
+
     Main.context["array"] = fileParser.setColumnToSameType(
         Main.context["array"], column
     )

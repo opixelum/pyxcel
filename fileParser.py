@@ -3,16 +3,27 @@ import xml.etree.ElementTree as ET
 import yaml
 
 
+def isfloat(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+
 def stringToTypeOfValue(string):
-    if string.isdigit():
-        if "." in string:
-            return float(string)
-        else:
+    if string[0] == "-" or string[0] == "+" or string[0].isdigit():
+        if string.isdigit():
             return int(string)
+        if isfloat(string):
+            return float(string)
+
     if string == "True" or string == "true":
         return True
+
     if string == "False" or string == "false":
         return False
+
     return string
 
 
@@ -133,7 +144,6 @@ def setColumnToSameType(array, column):
     - If it contains only digits then it will be converted to int or float (depending if it has a dot or not);
     - Else, it will be left as a string.
     """
-
     if columnType(array, column) == str:
         for row in array:
             row[column] = str(row[column])
