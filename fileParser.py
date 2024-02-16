@@ -38,7 +38,7 @@ def arrayToJson(arr, name):
 
 
 def isCsvParser(i, separator):
-    if not i.isdigit() and not i.isalpha() and i != separator and i != "\n" and i != " " and i != "\t" and i != "\r" and i != "\"" and i != "'" and i != "." and i != "!" and i != "?":
+    if not i.isdigit() and not i.isalpha() and i != separator and i != "\n" and i != "\r" and i != "\"" and i != "'" and i != "." and i != "!" and i != "?":
         return True
     return False
 
