@@ -24,9 +24,7 @@ def updateContextOnCellChange(row, column, sv):
     sv: StringVar
         The value of the cell.
     """
-    print(Main.context["array"], Main.context["original"])
     Main.context["array"][row][column] = fileParser.stringToTypeOfValue(sv.get())
-    print(Main.context["array"], Main.context["original"])
 
 
 def revertToOriginal():
@@ -34,7 +32,6 @@ def revertToOriginal():
     Reverts the array to its original state (before any modification).
     """
     # get type of file csv, json, xml, yaml
-    print(Main.context)
     ext = Main.context["file"].split(".")[-1]
     Main.context["file"] = Main.context["file"]
     if ext == "csv":
@@ -63,18 +60,25 @@ def createTable():
     for i in range(numRows):
         Main.window.grid_rowconfigure(i, weight=1)
 
+    # Keep track of the headers stringvars to update them on change
     for i, header in enumerate(Main.context["array"][0]):
         tmp = header
-        if tmp == Main.context["sortKey"]:
-            if Main.context["sortReverse"]:
-                tmp += " ▼"
-            else:
-                tmp += " ▲"
-        label = tk.Label(Main.window, text=tmp)
-        label.grid(row=0, column=i)
-        label.bind("<Button-1>", lambda _, x=header: sortArray(x))
-        if not isinstance(Main.context["array"][0][header], str):
-            label.bind("<Button-3>", lambda _, x=header: makeRightClickMenu(x))
+        # TODO: add sort icons with entries (maybe with a button on the right of the header?)
+        # if tmp == Main.context["sortKey"]:
+        #    if Main.context["sortReverse"]:
+        #        tmp += " ▼"
+        #    else:
+        #        tmp += " ▲"
+        header_sv = tk.StringVar(value=tmp)
+        header_entry = tk.Entry(Main.window, textvariable=header_sv)
+        header_entry.bind(
+            "<FocusOut>",
+            lambda *_, previous=header, sv=header_sv,: updateHeaderCellOnFocusOut(
+                previous, sv
+            ),
+        )
+        header_entry.grid(row=0, column=i)
+        header_entry.bind("<Button-3>", lambda _, x=header: makeRightClickMenu(x))
 
     for i, row in enumerate(Main.context["array"]):
         row_vars = {}
@@ -89,6 +93,7 @@ def createTable():
             )
             cell = tk.Entry(Main.window, textvariable=cell_content)
             cell.grid(row=i + 1, column=j)
+            cell.bind("<Button-3>", lambda _, x=key: makeRightClickMenu(x))
             row_vars[key] = cell_content
 
         Main.context["cell_vars"].append(row_vars)
@@ -192,14 +197,15 @@ def makeMenu():
     menubar.add_cascade(label="Sort", menu=sortmenu)
     editmenu = tk.Menu(menubar, tearoff=0)
     editmenu.add_command(label="Revert to original", command=lambda: revertToOriginal())
-    editmenu.add_command(label="Add column", command=lambda: print("Add column"))
     editmenu.add_command(label="Add row", command=lambda: addRow())
+    editmenu.add_command(label="Add column", command=lambda: addColumn())
     menubar.add_cascade(label="Edit", menu=editmenu)
 
 
 def makeRightClickMenu(column):
     rightClickMenu = tk.Menu(Main.window, tearoff=0)
     rightClickMenu.add_command(label="Show stats", command=lambda: showStats(column))
+    rightClickMenu.add_command(label="Sort", command=lambda: sortArray(column))
     rightClickMenu.post(Main.window.winfo_pointerx(), Main.window.winfo_pointery())
 
 
@@ -254,12 +260,6 @@ def resetSort():
     displayArray()
 
 
-def addRow():
-    """Adds a row to the table"""
-    Main.context["array"].append({key: "" for key in Main.context["array"][0]})
-    displayArray()
-
-
 def showStats(column):
     displayArray()
     windowStats = OpenWindow("300x300", "Stats")
@@ -302,7 +302,7 @@ def showStats(column):
         text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
         windowStats.mainloop()
-    elif typeStat == list:
+    elif typeStat == list or typeStat == str:
         min = len(Main.context["array"][0][column])
         max = len(Main.context["array"][0][column])
         avg = 0
@@ -313,14 +313,47 @@ def showStats(column):
                 max = len(i[column])
             avg += len(i[column])
         avg /= len(Main.context["array"])
-        text = tk.Label(
-            windowStats,
-            text="Min list size : "
-            + str(min)
-            + "\nMax list size: "
-            + str(max)
-            + "\nAvg list size: "
-            + str(avg),
+        min_text = (
+            "Min " + ("list" if typeStat == list else "string") + " size: " + str(min)
         )
+        max_text = (
+            "\nMax " + ("list" if typeStat == list else "string") + " size: " + str(max)
+        )
+        avg_text = (
+            "\nAvg " + ("list" if typeStat == list else "string") + " size: " + str(avg)
+        )
+        text = tk.Label(windowStats, text=min_text + max_text + avg_text)
         text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
+        windowStats.mainloop()
+
+
+def addRow():
+    """Adds a row to the table."""
+    Main.context["array"].append({key: "" for key in Main.context["array"][0]})
+    displayArray()
+
+
+def addColumn():
+    """Adds a column to the table."""
+    for row in Main.context["array"]:
+        row["new_column"] = ""
+    displayArray()
+
+
+def updateHeaderCellOnFocusOut(previous, sv):
+    """
+    Updates the context array when a header cell is modified.
+
+    parameters
+    ----------
+    previous: str
+        The previous value of the header.
+    sv: StringVar
+        The Tkinter StringVar object containing the new header name.
+    """
+    for row in Main.context["array"]:
+        row[sv.get()] = row.pop(previous)
+
+    # Need to update the header name on the frontend
+    displayArray()
