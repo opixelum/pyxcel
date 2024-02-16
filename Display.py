@@ -184,43 +184,46 @@ def save():
 def makeMenu():
     menubar = tk.Menu(Main.window)
     Main.window.config(menu=menubar)
+
     filemenu = tk.Menu(menubar, tearoff=0)
-    filemenu.add_command(label="New", command=lambda: print("New"))
-    filemenu.add_command(label="Open", command=lambda: openFile())
+    filemenu.add_command(label="New", command=lambda: newFile())
+    filemenu.add_command(label="Open...", command=lambda: openFile())
     filemenu.add_command(label="Save", command=lambda: save())
-    filemenu.add_command(label="Save as...", command=lambda: saveAs())
+    filemenu.add_command(label="Save As...", command=lambda: saveAs())
     filemenu.add_separator()
-    filemenu.add_command(label="Exit", command=Main.window.quit)
+    filemenu.add_command(label="Exit Pyxcel", command=Main.window.quit)
     menubar.add_cascade(label="File", menu=filemenu)
+
     sortmenu = tk.Menu(menubar, tearoff=0)
-    sortmenu.add_command(label="reset", command=lambda: resetSort())
+    sortmenu.add_command(label="Reset", command=lambda: resetSort())
     menubar.add_cascade(label="Sort", menu=sortmenu)
+
     editmenu = tk.Menu(menubar, tearoff=0)
-    editmenu.add_command(label="Revert to original", command=lambda: revertToOriginal())
-    editmenu.add_command(label="Add row", command=lambda: addRow())
-    editmenu.add_command(label="Add column", command=lambda: addColumn())
+    editmenu.add_command(label="Revert to Original", command=lambda: revertToOriginal())
+    editmenu.add_command(label="Add Row", command=lambda: addRow())
+    editmenu.add_command(label="Add Column", command=lambda: addColumn())
     menubar.add_cascade(label="Edit", menu=editmenu)
 
 
 def headerRightClickMenu(header):
     rightClickMenu = tk.Menu(Main.window, tearoff=0)
-    rightClickMenu.add_command(label="Show stats", command=lambda: showStats(header))
+    rightClickMenu.add_command(label="Show Stats", command=lambda: showStats(header))
     rightClickMenu.add_command(label="Sort", command=lambda: sortArray(header))
     rightClickMenu.add_command(
-        label="Delete column", command=lambda: deleteColumn(header)
+        label="Delete Column", command=lambda: deleteColumn(header)
     )
     rightClickMenu.post(Main.window.winfo_pointerx(), Main.window.winfo_pointery())
 
 
 def cellRightClickMenu(header, row_number):
     rightClickMenu = tk.Menu(Main.window, tearoff=0)
-    rightClickMenu.add_command(label="Show stats", command=lambda: showStats(header))
+    rightClickMenu.add_command(label="Show Stats", command=lambda: showStats(header))
     rightClickMenu.add_command(label="Sort", command=lambda: sortArray(header))
     rightClickMenu.add_command(
-        label="Delete row", command=lambda: deleteRow(row_number)
+        label="Delete Row", command=lambda: deleteRow(row_number)
     )
     rightClickMenu.add_command(
-        label="Delete column", command=lambda: deleteColumn(header)
+        label="Delete Column", command=lambda: deleteColumn(header)
     )
     rightClickMenu.post(Main.window.winfo_pointerx(), Main.window.winfo_pointery())
 
@@ -245,7 +248,7 @@ def displayArray():
     clearWindow()
     makeMenu()
     if len(Main.context["array"]) == 0:
-        text = tk.Label(Main.window, text="No data to display")
+        text = tk.Label(Main.window, text="No data to display.")
         text.place(relx=0.5, rely=0.5, anchor="center")
     else:
         createTable()
@@ -378,4 +381,14 @@ def deleteRow(row_number):
 def deleteColumn(header):
     for row in Main.context["array"]:
         row.pop(header)
+    displayArray()
+
+
+def newFile():
+    Main.context = {
+        "array": [{"new_column": ""}],
+        "sortKey": "",
+        "sortReverse": False,
+        "file": "",
+    }
     displayArray()
