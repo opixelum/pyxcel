@@ -78,7 +78,7 @@ def createTable():
             ),
         )
         header_entry.grid(row=0, column=i)
-        header_entry.bind("<Button-3>", lambda _, x=header: makeRightClickMenu(x))
+        header_entry.bind("<Button-3>", lambda _, x=header: headerRightClickMenu(x))
 
     for i, row in enumerate(Main.context["array"]):
         row_vars = {}
@@ -93,7 +93,7 @@ def createTable():
             )
             cell = tk.Entry(Main.window, textvariable=cell_content)
             cell.grid(row=i + 1, column=j)
-            cell.bind("<Button-3>", lambda _, x=key: makeRightClickMenu(x))
+            cell.bind("<Button-3>", lambda _, x=key, row=i: cellRightClickMenu(x, row))
             row_vars[key] = cell_content
 
         Main.context["cell_vars"].append(row_vars)
@@ -202,21 +202,26 @@ def makeMenu():
     menubar.add_cascade(label="Edit", menu=editmenu)
 
 
-def makeRightClickMenu(column):
+def headerRightClickMenu(header):
     rightClickMenu = tk.Menu(Main.window, tearoff=0)
-    rightClickMenu.add_command(label="Show stats", command=lambda: showStats(column))
-    rightClickMenu.add_command(label="Sort", command=lambda: sortArray(column))
+    rightClickMenu.add_command(label="Show stats", command=lambda: showStats(header))
+    rightClickMenu.add_command(label="Sort", command=lambda: sortArray(header))
+    rightClickMenu.post(Main.window.winfo_pointerx(), Main.window.winfo_pointery())
+
+
+def cellRightClickMenu(header, row_number):
+    rightClickMenu = tk.Menu(Main.window, tearoff=0)
+    rightClickMenu.add_command(label="Show stats", command=lambda: showStats(header))
+    rightClickMenu.add_command(label="Sort", command=lambda: sortArray(header))
+    rightClickMenu.add_command(
+        label="Delete row", command=lambda: deleteRow(row_number)
+    )
     rightClickMenu.post(Main.window.winfo_pointerx(), Main.window.winfo_pointery())
 
 
 def initWindow():
     Main.window = OpenWindow("1000x500", "Pyxcel")
-    Main.context = {
-        "array": [],
-        "sortKey": "",
-        "sortReverse": False,
-        "file": ""
-    }
+    Main.context = {"array": [], "sortKey": "", "sortReverse": False, "file": ""}
     # put save if ctrl + s is pressed
     Main.window.bind("<Control-s>", lambda _: save())
     displayArray()
@@ -356,4 +361,9 @@ def updateHeaderCellOnFocusOut(previous, sv):
         row[sv.get()] = row.pop(previous)
 
     # Need to update the header name on the frontend
+    displayArray()
+
+
+def deleteRow(row_number):
+    Main.context["array"].pop(row_number)
     displayArray()
