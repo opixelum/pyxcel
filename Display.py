@@ -206,6 +206,9 @@ def headerRightClickMenu(header):
     rightClickMenu = tk.Menu(Main.window, tearoff=0)
     rightClickMenu.add_command(label="Show stats", command=lambda: showStats(header))
     rightClickMenu.add_command(label="Sort", command=lambda: sortArray(header))
+    rightClickMenu.add_command(
+        label="Delete column", command=lambda: deleteColumn(header)
+    )
     rightClickMenu.post(Main.window.winfo_pointerx(), Main.window.winfo_pointery())
 
 
@@ -215,6 +218,9 @@ def cellRightClickMenu(header, row_number):
     rightClickMenu.add_command(label="Sort", command=lambda: sortArray(header))
     rightClickMenu.add_command(
         label="Delete row", command=lambda: deleteRow(row_number)
+    )
+    rightClickMenu.add_command(
+        label="Delete column", command=lambda: deleteColumn(header)
     )
     rightClickMenu.post(Main.window.winfo_pointerx(), Main.window.winfo_pointery())
 
@@ -366,4 +372,10 @@ def updateHeaderCellOnFocusOut(previous, sv):
 
 def deleteRow(row_number):
     Main.context["array"].pop(row_number)
+    displayArray()
+
+
+def deleteColumn(header):
+    for row in Main.context["array"]:
+        row.pop(header)
     displayArray()
