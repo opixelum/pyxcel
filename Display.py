@@ -24,9 +24,7 @@ def updateContextOnCellChange(row, column, sv):
     sv: StringVar
         The value of the cell.
     """
-    print(Main.context["array"], Main.context["original"])
     Main.context["array"][row][column] = fileParser.stringToTypeOfValue(sv.get())
-    print(Main.context["array"], Main.context["original"])
 
 
 def revertToOriginal():
@@ -34,7 +32,6 @@ def revertToOriginal():
     Reverts the array to its original state (before any modification).
     """
     # get type of file csv, json, xml, yaml
-    print(Main.context)
     ext = Main.context["file"].split(".")[-1]
     Main.context["file"] = Main.context["file"]
     if ext == "csv":
