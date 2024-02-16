@@ -37,21 +37,36 @@ def arrayToJson(arr, name):
         json.dump(arr, f)
 
 
+def isCsvParser(i, separator):
+    if not i.isdigit() and not i.isalpha() and i != separator and i != "\n" and i != " " and i != "\t" and i != "\r" and i != "\"" and i != "'" and i != "." and i != "!" and i != "?":
+        return True
+    return False
+
 def csvToArray(name):
     res = []
 
     with open(name, "r") as f:
         t = f.read().split("\n")
-        header = t[0].split(";")
+        separator = ";"
+        for i in t[0]:
+            if isCsvParser(i, separator):
+                separator = i
+                break
 
+        header = t[0].split(separator)
+        for i in t[1]:
+            if isCsvParser(i, separator):
+                separator2 = i
+                break
         for i in t[1:]:
             if i == "":
                 break
 
             d = {}
-            for j, value in enumerate(i.split(";")):
-                if "," in value:
-                    d[header[j]] = [stringToTypeOfValue(k) for k in value.split(",")]
+            for j, value in enumerate(i.split(separator)):
+                print(separator2)
+                if separator2 in value:
+                    d[header[j]] = [stringToTypeOfValue(k) for k in value.split(separator2)]
                 else:
                     d[header[j]] = stringToTypeOfValue(value)
             res.append(d)
