@@ -64,8 +64,9 @@ def csvToArray(name):
 
             d = {}
             for j, value in enumerate(i.split(separator)):
-                print(separator2)
                 if separator2 in value:
+                    print(separator2)
+                if separator and separator in value:
                     d[header[j]] = [stringToTypeOfValue(k) for k in value.split(separator2)]
                 else:
                     d[header[j]] = stringToTypeOfValue(value)
