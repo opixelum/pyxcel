@@ -340,4 +340,5 @@ def updateHeaderCellOnFocusOut(previous, sv):
     for row in Main.context["array"]:
         row[sv.get()] = row.pop(previous)
 
+    # Need to update the header name on the frontend
     displayArray()
