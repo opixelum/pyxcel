@@ -1,5 +1,4 @@
 import json
-import Main
 import xml.etree.ElementTree as ET
 import yaml
 
@@ -97,3 +96,55 @@ def yamlToArray(name):
 def arrayToYaml(array, name):
     with open(name, "w") as f:
         yaml.dump(array, f)
+
+
+def columnType(array, column):
+    has_bool = False
+    has_int = False
+    has_float = False
+
+    for row in array:
+        row[column] = stringToTypeOfValue(str(row[column]))
+        if isinstance(row[column], str):
+            return str
+        if isinstance(row[column], bool):
+            has_bool = True
+        if isinstance(row[column], int):
+            has_int = True
+        if isinstance(row[column], float):
+            has_float = True
+
+    if has_bool and not has_int and not has_float:
+        return bool
+
+    if has_float:
+        return float
+
+    if has_int:
+        return int
+
+    return str
+
+
+def setColumnToSameType(array, column):
+    """
+    Set all the values in a column to the same type:
+    - If there it contains only "true" or "false" then it will be converted to boolean;
+    - If it contains only digits then it will be converted to int or float (depending if it has a dot or not);
+    - Else, it will be left as a string.
+    """
+
+    if columnType(array, column) == str:
+        for row in array:
+            row[column] = str(row[column])
+    elif columnType(array, column) == bool:
+        for row in array:
+            row[column] = bool(row[column])
+    elif columnType(array, column) == float:
+        for row in array:
+            row[column] = float(row[column])
+    elif columnType(array, column) == int:
+        for row in array:
+            row[column] = int(row[column])
+
+    return array

@@ -25,6 +25,9 @@ def updateContextOnCellChange(row, column, sv):
         The value of the cell.
     """
     Main.context["array"][row][column] = fileParser.stringToTypeOfValue(sv.get())
+    Main.context["array"] = fileParser.setColumnToSameType(
+        Main.context["array"], column
+    )
 
 
 def revertToOriginal():
@@ -278,7 +281,8 @@ def showStats(column):
     displayArray()
     windowStats = OpenWindow("300x300", "Stats")
     # get type of column
-    typeStat = type(Main.context["array"][0][column])
+    typeStat = fileParser.columnType(Main.context["array"], column)
+    print(typeStat)
     if typeStat == int or typeStat == float:
         min = Main.context["array"][0][column]
         max = Main.context["array"][0][column]
