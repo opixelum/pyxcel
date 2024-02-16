@@ -121,13 +121,13 @@ def save_as():
 
     Main.context["file"] = file.name
     if ext == "csv":
-        fileParser.arrayToCsv(Main.context["data"], file.name)
+        fileParser.data_to_csv(Main.context["data"], file.name)
     elif ext == "json":
-        fileParser.arrayToJson(Main.context["data"], file.name)
+        fileParser.data_to_json(Main.context["data"], file.name)
     elif ext == "xml":
-        fileParser.arrayToXml(Main.context["data"], file.name)
+        fileParser.data_to_xml(Main.context["data"], file.name)
     elif ext == "yaml":
-        fileParser.arrayToYaml(Main.context["data"], file.name)
+        fileParser.data_to_yaml(Main.context["data"], file.name)
     else:
         print("ERROR : File type not supported")
         Main.context["data"] = []
@@ -145,13 +145,13 @@ def save():
             row[key] = Main.context["cell_vars"][i][key].get()
 
     if ext == "csv":
-        fileParser.arrayToCsv(Main.context["data"], Main.context["file"])
+        fileParser.data_to_csv(Main.context["data"], Main.context["file"])
     elif ext == "json":
-        fileParser.arrayToJson(Main.context["data"], Main.context["file"])
+        fileParser.data_to_json(Main.context["data"], Main.context["file"])
     elif ext == "xml":
-        fileParser.arrayToXml(Main.context["data"], Main.context["file"])
+        fileParser.data_to_xml(Main.context["data"], Main.context["file"])
     elif ext == "yaml":
-        fileParser.arrayToYaml(Main.context["data"], Main.context["file"])
+        fileParser.data_to_yaml(Main.context["data"], Main.context["file"])
     else:
         print("ERROR : File type not supported")
 
