@@ -19,17 +19,16 @@ def revert_to_original():
     """
     Reverts the array to its original state (before any modification).
     """
-    # get type of file csv, json, xml, yaml
-    ext = main.context["file"].split(".")[-1]
-    main.context["file"] = main.context["file"]
-    if ext == "csv":
-        main.context["data"] = file_parser.csv_to_data(main.context["file"])
-    elif ext == "json":
-        main.context["data"] = file_parser.json_to_data(main.context["file"])
-    elif ext == "xml":
-        main.context["data"] = file_parser.xml_to_data(main.context["file"])
-    elif ext == "yaml":
-        main.context["data"] = file_parser.yaml_to_data(main.context["file"])
+    file_type = main.context["file_path"].split(".")[-1]
+    main.context["file_path"] = main.context["file_path"]
+    if file_type == "csv":
+        main.context["data"] = file_parser.csv_to_data(main.context["file_path"])
+    elif file_type == "json":
+        main.context["data"] = file_parser.json_to_data(main.context["file_path"])
+    elif file_type == "xml":
+        main.context["data"] = file_parser.xml_to_data(main.context["file_path"])
+    elif file_type == "yaml":
+        main.context["data"] = file_parser.yaml_to_data(main.context["file_path"])
     display_data()
 
 
@@ -76,28 +75,31 @@ def create_table():
 
 
 def open_file():
-    file = filedialog.askopenfile()
     main.context = {
-        "data": [],
-        "sortKey": "",
-        "sortReverse": False,
-        "file": "",
+        "sort_key": "",
+        "sort_reverse": False,
     }
+
+    file = filedialog.askopenfile()
+
     if file:
         # get type of file csv, json, xml, yaml
-        ext = file.name.split(".")[-1]
-        main.context["file"] = file.name
-        if ext == "csv":
+        file_type = file.name.split(".")[-1]
+
+        main.context["file_path"] = file.name
+
+        if file_type == "csv":
             main.context["data"] = file_parser.csv_to_data(file.name)
-        elif ext == "json":
+        elif file_type == "json":
             main.context["data"] = file_parser.json_to_data(file.name)
-        elif ext == "xml":
+        elif file_type == "xml":
             main.context["data"] = file_parser.xml_to_data(file.name)
-        elif ext == "yaml":
+        elif file_type == "yaml":
             main.context["data"] = file_parser.yaml_to_data(file.name)
         else:
-            print("ERROR : File type not supported")
+            print("ERROR: File type not supported")
             main.context["data"] = []
+
         display_data()
 
 
@@ -113,47 +115,50 @@ def save_as():
     )
     if file is None:
         return
-    ext = file.name.split(".")[-1]
+    file_type = file.name.split(".")[-1]
 
     for i, row in enumerate(main.context["data"]):
         for _, (key, _) in enumerate(row.items()):
             row[key] = main.context["cell_vars"][i][key].get()
 
-    main.context["file"] = file.name
-    if ext == "csv":
+    main.context["file_path"] = file.name
+
+    if file_type == "csv":
         file_parser.data_to_csv(main.context["data"], file.name)
-    elif ext == "json":
+    elif file_type == "json":
         file_parser.data_to_json(main.context["data"], file.name)
-    elif ext == "xml":
+    elif file_type == "xml":
         file_parser.data_to_xml(main.context["data"], file.name)
-    elif ext == "yaml":
+    elif file_type == "yaml":
         file_parser.data_to_yaml(main.context["data"], file.name)
     else:
-        print("ERROR : File type not supported")
+        print("ERROR: File type not supported")
         main.context["data"] = []
+
     display_data()
 
 
 def save():
-    if main.context["file"] == "":
+    if main.context["file_path"] == "":
         save_as()
         return
-    ext = main.context["file"].split(".")[-1]
+
+    file_type = main.context["file_path"].split(".")[-1]
 
     for i, row in enumerate(main.context["data"]):
         for _, (key, _) in enumerate(row.items()):
             row[key] = main.context["cell_vars"][i][key].get()
 
-    if ext == "csv":
-        file_parser.data_to_csv(main.context["data"], main.context["file"])
-    elif ext == "json":
-        file_parser.data_to_json(main.context["data"], main.context["file"])
-    elif ext == "xml":
-        file_parser.data_to_xml(main.context["data"], main.context["file"])
-    elif ext == "yaml":
-        file_parser.data_to_yaml(main.context["data"], main.context["file"])
+    if file_type == "csv":
+        file_parser.data_to_csv(main.context["data"], main.context["file_path"])
+    elif file_type == "json":
+        file_parser.data_to_json(main.context["data"], main.context["file_path"])
+    elif file_type == "xml":
+        file_parser.data_to_xml(main.context["data"], main.context["file_path"])
+    elif file_type == "yaml":
+        file_parser.data_to_yaml(main.context["data"], main.context["file_path"])
     else:
-        print("ERROR : File type not supported")
+        print("ERROR: File type not supported")
 
 
 def create_menus():
@@ -207,9 +212,11 @@ def value_right_click_menu(header, row_number):
 
 def init_window():
     main.window = open_window("1000x500", "Pyxcel")
-    main.context = {"data": [], "sortKey": "", "sortReverse": False, "file": ""}
-    # put save if ctrl + s is pressed
+    main.context = {"data": [], "sort_key": "", "sort_reverse": False, "file_path": ""}
+
+    # Shortcuts
     main.window.bind("<Control-s>", lambda _: save())
+
     display_data()
     main.window.mainloop()
 
@@ -232,86 +239,106 @@ def display_data():
 
 
 def sort_data(column):
-    if main.context["sortKey"] == column:
+    if main.context["sort_key"] == column:
         main.context["data"].sort(
-            key=lambda x: x[column], reverse=not main.context["sortReverse"]
+            key=lambda x: x[column], reverse=not main.context["sort_reverse"]
         )
-        main.context["sortReverse"] = not main.context["sortReverse"]
+        main.context["sort_reverse"] = not main.context["sort_reverse"]
     else:
         main.context["data"].sort(key=lambda x: x[column])
-        main.context["sortReverse"] = False
-    main.context["sortKey"] = column
+        main.context["sort_reverse"] = False
+    main.context["sort_key"] = column
     display_data()
 
 
 def reset_sort():
-    main.context["sortKey"] = ""
-    main.context["sortReverse"] = False
+    main.context["sort_key"] = ""
+    main.context["sort_reverse"] = False
     display_data()
 
 
 def show_stats(column):
     display_data()
     windowStats = open_window("300x300", "Stats")
-    # get type of column
-    typeStat = file_parser.column_type(main.context["data"], column)
-    print(typeStat)
-    if typeStat == int or typeStat == float:
+
+    column_type = file_parser.column_type(main.context["data"], column)
+
+    # Numbers
+    if column_type == int or column_type == float:
         min = main.context["data"][0][column]
         max = main.context["data"][0][column]
         avg = 0
+
         for i in main.context["data"]:
             if min > i[column]:
                 min = i[column]
             if max < i[column]:
                 max = i[column]
             avg += i[column]
+
         avg /= len(main.context["data"])
         text = tk.Label(
             windowStats,
-            text="Min : " + str(min) + "\nMax : " + str(max) + "\nAvg : " + str(avg),
+            text="Min: " + str(min) + "\nMax: " + str(max) + "\nAvg: " + str(avg),
         )
         text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
         windowStats.mainloop()
-    elif typeStat == bool:
+
+    # Booleans
+    elif column_type == bool:
         true = 0
         false = 0
+
         for i in main.context["data"]:
             if i[column]:
                 true += 1
             else:
                 false += 1
+
         text = tk.Label(
             windowStats,
-            text="True : "
+            text="True: "
             + str(true / len(main.context["data"]) * 100)
-            + "%\nFalse : "
+            + "%\nFalse: "
             + str(false / len(main.context["data"]) * 100)
             + "%",
         )
         text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
         windowStats.mainloop()
-    elif typeStat == list or typeStat == str:
+
+    # Lists and strings
+    elif column_type == list or column_type == str:
         min = len(main.context["data"][0][column])
         max = len(main.context["data"][0][column])
         avg = 0
+
         for i in main.context["data"]:
             if min > len(i[column]):
                 min = len(i[column])
             if max < len(i[column]):
                 max = len(i[column])
             avg += len(i[column])
+
         avg /= len(main.context["data"])
         min_text = (
-            "Min " + ("list" if typeStat == list else "string") + " size: " + str(min)
+            "Min "
+            + ("list" if column_type == list else "string")
+            + " size: "
+            + str(min)
         )
         max_text = (
-            "\nMax " + ("list" if typeStat == list else "string") + " size: " + str(max)
+            "\nMax "
+            + ("list" if column_type == list else "string")
+            + " size: "
+            + str(max)
         )
         avg_text = (
-            "\nAvg " + ("list" if typeStat == list else "string") + " size: " + str(avg)
+            "\nAvg "
+            + ("list" if column_type == list else "string")
+            + " size: "
+            + str(avg)
         )
         text = tk.Label(windowStats, text=min_text + max_text + avg_text)
         text.place(relx=0.5, rely=0.5, anchor="center")
@@ -320,29 +347,17 @@ def show_stats(column):
 
 
 def add_row():
-    """Adds a row to the table."""
     main.context["data"].append({key: "" for key in main.context["data"][0]})
     display_data()
 
 
 def add_column():
-    """Adds a column to the table."""
     for row in main.context["data"]:
-        row["new_column"] = ""
+        row["New column"] = ""
     display_data()
 
 
 def update_column_name(previous, sv):
-    """
-    Updates the context array when a header cell is modified.
-
-    parameters
-    ----------
-    previous: str
-        The previous value of the header.
-    sv: StringVar
-        The Tkinter StringVar object containing the new header name.
-    """
     for row in main.context["data"]:
         row[sv.get()] = row.pop(previous)
 
@@ -364,8 +379,8 @@ def delete_column(header):
 def new_file():
     main.context = {
         "data": [{"New column": ""}],
-        "sortKey": "",
-        "sortReverse": False,
-        "file": "",
+        "sort_key": "",
+        "sort_reverse": False,
+        "file_path": "",
     }
     display_data()
