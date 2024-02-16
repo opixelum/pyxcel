@@ -1,7 +1,7 @@
-import Display
+import display
 
 global window
 global context
 
 if __name__ == "__main__":
-    Display.init_window()
+    display.init_window()
