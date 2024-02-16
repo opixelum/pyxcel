@@ -11,26 +11,8 @@ def OpenWindow(size, title):
     return w
 
 
-def updateContextOnCellChange(row, column, sv):
-    """
-    Updates the context array when a cell is modified.
-
-    Parameters
-    ----------
-    row: int
-        The number of the cell's row.
-    column: int
-        The number of the cell's column.
-    sv: StringVar
-        The value of the cell.
-    """
-    for i, row in enumerate(Main.context["array"]):
-        for _, (key, _) in enumerate(row.items()):
-            row[key] = Main.context["cell_vars"][i][key].get()
-
-    Main.context["array"] = fileParser.setColumnToSameType(
-        Main.context["array"], column
-    )
+def update_value(row_number, column_name, value_string_var):
+    Main.context["data"][row_number][column_name] = value_string_var.get()
 
 
 def revertToOriginal():
@@ -41,22 +23,19 @@ def revertToOriginal():
     ext = Main.context["file"].split(".")[-1]
     Main.context["file"] = Main.context["file"]
     if ext == "csv":
-        Main.context["array"] = fileParser.csvToArray(Main.context["file"])
+        Main.context["data"] = fileParser.csvToArray(Main.context["file"])
     elif ext == "json":
-        Main.context["array"] = fileParser.jsonFileToArray(Main.context["file"])
+        Main.context["data"] = fileParser.jsonFileToArray(Main.context["file"])
     elif ext == "xml":
-        Main.context["array"] = fileParser.xmlToArray(Main.context["file"])
+        Main.context["data"] = fileParser.xmlToArray(Main.context["file"])
     elif ext == "yaml":
-        Main.context["array"] = fileParser.yamlToArray(Main.context["file"])
+        Main.context["data"] = fileParser.yamlToArray(Main.context["file"])
     displayArray()
 
 
 def createTable():
-    numRows = max(len(Main.context["array"]) + 1, 10)
-    numColumns = len(Main.context["array"][0])
-
-    # Contains the reference to each cell entry
-    Main.context["cell_vars"] = []
+    numRows = max(len(Main.context["data"]) + 1, 10)
+    numColumns = len(Main.context["data"][0])
 
     for i in range(numColumns):
         Main.window.grid_columnconfigure(i, weight=1)
@@ -64,48 +43,42 @@ def createTable():
         Main.window.grid_rowconfigure(i, weight=1)
 
     # Keep track of the headers stringvars to update them on change
-    for i, header in enumerate(Main.context["array"][0]):
-        tmp = header
-        # TODO: add sort icons with entries (maybe with a button on the right of the header?)
-        # if tmp == Main.context["sortKey"]:
-        #    if Main.context["sortReverse"]:
-        #        tmp += " ▼"
-        #    else:
-        #        tmp += " ▲"
-        header_sv = tk.StringVar(value=tmp)
+    for column_number, column_name in enumerate(Main.context["data"][0]):
+        header_sv = tk.StringVar(value=column_name)
         header_entry = tk.Entry(Main.window, textvariable=header_sv)
         header_entry.bind(
             "<FocusOut>",
-            lambda *_, previous=header, sv=header_sv,: updateHeaderCellOnFocusOut(
+            lambda *_, previous=column_name, sv=header_sv,: updateHeaderCellOnFocusOut(
                 previous, sv
             ),
         )
-        header_entry.grid(row=0, column=i)
-        header_entry.bind("<Button-3>", lambda _, x=header: headerRightClickMenu(x))
+        header_entry.grid(row=0, column=column_number)
+        header_entry.bind(
+            "<Button-3>", lambda _, x=column_name: headerRightClickMenu(x)
+        )
 
-    for i, row in enumerate(Main.context["array"]):
-        row_vars = {}
-        for j, (key, value) in enumerate(row.items()):
-            cell_content = tk.StringVar(value=value)
-            cell_content.trace_add(
+    for row_number, row in enumerate(Main.context["data"]):
+        for column_number, (column_name, value) in enumerate(row.items()):
+            value_string_var = tk.StringVar(value=value)
+            value_string_var.trace_add(
                 "write",
                 lambda *_,
-                row=i,
-                column=key,
-                sv=cell_content: updateContextOnCellChange(row, column, sv),
+                a=row_number,
+                b=column_name,
+                c=value_string_var: update_value(a, b, c),
             )
-            cell = tk.Entry(Main.window, textvariable=cell_content)
-            cell.grid(row=i + 1, column=j)
-            cell.bind("<Button-3>", lambda _, x=key, row=i: cellRightClickMenu(x, row))
-            row_vars[key] = cell_content
-
-        Main.context["cell_vars"].append(row_vars)
+            cell = tk.Entry(Main.window, textvariable=value_string_var)
+            cell.grid(row=row_number + 1, column=column_number)
+            cell.bind(
+                "<Button-3>",
+                lambda _, x=column_name, row=row_number: cellRightClickMenu(x, row),
+            )
 
 
 def openFile():
     file = filedialog.askopenfile()
     Main.context = {
-        "array": [],
+        "data": [],
         "sortKey": "",
         "sortReverse": False,
         "file": "",
@@ -115,16 +88,16 @@ def openFile():
         ext = file.name.split(".")[-1]
         Main.context["file"] = file.name
         if ext == "csv":
-            Main.context["array"] = fileParser.csvToArray(file.name)
+            Main.context["data"] = fileParser.csvToArray(file.name)
         elif ext == "json":
-            Main.context["array"] = fileParser.jsonFileToArray(file.name)
+            Main.context["data"] = fileParser.jsonFileToArray(file.name)
         elif ext == "xml":
-            Main.context["array"] = fileParser.xmlToArray(file.name)
+            Main.context["data"] = fileParser.xmlToArray(file.name)
         elif ext == "yaml":
-            Main.context["array"] = fileParser.yamlToArray(file.name)
+            Main.context["data"] = fileParser.yamlToArray(file.name)
         else:
             print("ERROR : File type not supported")
-            Main.context["array"] = []
+            Main.context["data"] = []
         displayArray()
 
 
@@ -142,22 +115,22 @@ def saveAs():
         return
     ext = file.name.split(".")[-1]
 
-    for i, row in enumerate(Main.context["array"]):
+    for i, row in enumerate(Main.context["data"]):
         for _, (key, _) in enumerate(row.items()):
             row[key] = Main.context["cell_vars"][i][key].get()
 
     Main.context["file"] = file.name
     if ext == "csv":
-        fileParser.arrayToCsv(Main.context["array"], file.name)
+        fileParser.arrayToCsv(Main.context["data"], file.name)
     elif ext == "json":
-        fileParser.arrayToJson(Main.context["array"], file.name)
+        fileParser.arrayToJson(Main.context["data"], file.name)
     elif ext == "xml":
-        fileParser.arrayToXml(Main.context["array"], file.name)
+        fileParser.arrayToXml(Main.context["data"], file.name)
     elif ext == "yaml":
-        fileParser.arrayToYaml(Main.context["array"], file.name)
+        fileParser.arrayToYaml(Main.context["data"], file.name)
     else:
         print("ERROR : File type not supported")
-        Main.context["array"] = []
+        Main.context["data"] = []
     displayArray()
 
 
@@ -167,18 +140,18 @@ def save():
         return
     ext = Main.context["file"].split(".")[-1]
 
-    for i, row in enumerate(Main.context["array"]):
+    for i, row in enumerate(Main.context["data"]):
         for _, (key, _) in enumerate(row.items()):
             row[key] = Main.context["cell_vars"][i][key].get()
 
     if ext == "csv":
-        fileParser.arrayToCsv(Main.context["array"], Main.context["file"])
+        fileParser.arrayToCsv(Main.context["data"], Main.context["file"])
     elif ext == "json":
-        fileParser.arrayToJson(Main.context["array"], Main.context["file"])
+        fileParser.arrayToJson(Main.context["data"], Main.context["file"])
     elif ext == "xml":
-        fileParser.arrayToXml(Main.context["array"], Main.context["file"])
+        fileParser.arrayToXml(Main.context["data"], Main.context["file"])
     elif ext == "yaml":
-        fileParser.arrayToYaml(Main.context["array"], Main.context["file"])
+        fileParser.arrayToYaml(Main.context["data"], Main.context["file"])
     else:
         print("ERROR : File type not supported")
 
@@ -232,7 +205,7 @@ def cellRightClickMenu(header, row_number):
 
 def initWindow():
     Main.window = OpenWindow("1000x500", "Pyxcel")
-    Main.context = {"array": [], "sortKey": "", "sortReverse": False, "file": ""}
+    Main.context = {"data": [], "sortKey": "", "sortReverse": False, "file": ""}
     # put save if ctrl + s is pressed
     Main.window.bind("<Control-s>", lambda _: save())
     displayArray()
@@ -248,7 +221,7 @@ def clearWindow():
 def displayArray():
     clearWindow()
     makeMenu()
-    if len(Main.context["array"]) == 0:
+    if len(Main.context["data"]) == 0:
         text = tk.Label(Main.window, text="No data to display.")
         text.place(relx=0.5, rely=0.5, anchor="center")
     else:
@@ -258,12 +231,12 @@ def displayArray():
 
 def sortArray(column):
     if Main.context["sortKey"] == column:
-        Main.context["array"].sort(
+        Main.context["data"].sort(
             key=lambda x: x[column], reverse=not Main.context["sortReverse"]
         )
         Main.context["sortReverse"] = not Main.context["sortReverse"]
     else:
-        Main.context["array"].sort(key=lambda x: x[column])
+        Main.context["data"].sort(key=lambda x: x[column])
         Main.context["sortReverse"] = False
     Main.context["sortKey"] = column
     displayArray()
@@ -279,19 +252,19 @@ def showStats(column):
     displayArray()
     windowStats = OpenWindow("300x300", "Stats")
     # get type of column
-    typeStat = fileParser.columnType(Main.context["array"], column)
+    typeStat = fileParser.columnType(Main.context["data"], column)
     print(typeStat)
     if typeStat == int or typeStat == float:
-        min = Main.context["array"][0][column]
-        max = Main.context["array"][0][column]
+        min = Main.context["data"][0][column]
+        max = Main.context["data"][0][column]
         avg = 0
-        for i in Main.context["array"]:
+        for i in Main.context["data"]:
             if min > i[column]:
                 min = i[column]
             if max < i[column]:
                 max = i[column]
             avg += i[column]
-        avg /= len(Main.context["array"])
+        avg /= len(Main.context["data"])
         text = tk.Label(
             windowStats,
             text="Min : " + str(min) + "\nMax : " + str(max) + "\nAvg : " + str(avg),
@@ -302,7 +275,7 @@ def showStats(column):
     elif typeStat == bool:
         true = 0
         false = 0
-        for i in Main.context["array"]:
+        for i in Main.context["data"]:
             if i[column]:
                 true += 1
             else:
@@ -310,25 +283,25 @@ def showStats(column):
         text = tk.Label(
             windowStats,
             text="True : "
-            + str(true / len(Main.context["array"]) * 100)
+            + str(true / len(Main.context["data"]) * 100)
             + "%\nFalse : "
-            + str(false / len(Main.context["array"]) * 100)
+            + str(false / len(Main.context["data"]) * 100)
             + "%",
         )
         text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
         windowStats.mainloop()
     elif typeStat == list or typeStat == str:
-        min = len(Main.context["array"][0][column])
-        max = len(Main.context["array"][0][column])
+        min = len(Main.context["data"][0][column])
+        max = len(Main.context["data"][0][column])
         avg = 0
-        for i in Main.context["array"]:
+        for i in Main.context["data"]:
             if min > len(i[column]):
                 min = len(i[column])
             if max < len(i[column]):
                 max = len(i[column])
             avg += len(i[column])
-        avg /= len(Main.context["array"])
+        avg /= len(Main.context["data"])
         min_text = (
             "Min " + ("list" if typeStat == list else "string") + " size: " + str(min)
         )
@@ -346,13 +319,13 @@ def showStats(column):
 
 def addRow():
     """Adds a row to the table."""
-    Main.context["array"].append({key: "" for key in Main.context["array"][0]})
+    Main.context["data"].append({key: "" for key in Main.context["data"][0]})
     displayArray()
 
 
 def addColumn():
     """Adds a column to the table."""
-    for row in Main.context["array"]:
+    for row in Main.context["data"]:
         row["new_column"] = ""
     displayArray()
 
@@ -368,7 +341,7 @@ def updateHeaderCellOnFocusOut(previous, sv):
     sv: StringVar
         The Tkinter StringVar object containing the new header name.
     """
-    for row in Main.context["array"]:
+    for row in Main.context["data"]:
         row[sv.get()] = row.pop(previous)
 
     # Need to update the header name on the frontend
@@ -376,19 +349,19 @@ def updateHeaderCellOnFocusOut(previous, sv):
 
 
 def deleteRow(row_number):
-    Main.context["array"].pop(row_number)
+    Main.context["data"].pop(row_number)
     displayArray()
 
 
 def deleteColumn(header):
-    for row in Main.context["array"]:
+    for row in Main.context["data"]:
         row.pop(header)
     displayArray()
 
 
 def newFile():
     Main.context = {
-        "array": [{"new_column": ""}],
+        "data": [{"New column": ""}],
         "sortKey": "",
         "sortReverse": False,
         "file": "",
