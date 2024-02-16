@@ -54,6 +54,7 @@ def csvToArray(name):
                 break
 
         header = t[0].split(separator)
+        separator2 = ""
         for i in t[1]:
             if isCsvParser(i, separator):
                 separator2 = i
@@ -64,7 +65,7 @@ def csvToArray(name):
 
             d = {}
             for j, value in enumerate(i.split(separator)):
-                if not separator2 :
+                if separator2 == "":
                     d[header[j]] = stringToTypeOfValue(value)
                 else:
                     if separator2 in value:
