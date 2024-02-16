@@ -174,8 +174,8 @@ def makeMenu():
     sortmenu.add_command(label="reset", command=lambda: resetSort())
     menubar.add_cascade(label="Sort", menu=sortmenu)
     editmenu = tk.Menu(menubar, tearoff=0)
-    editmenu.add_command(label="Add column", command=lambda: print("Add column"))
     editmenu.add_command(label="Add row", command=lambda: addRow())
+    editmenu.add_command(label="Add column", command=lambda: addColumn())
     menubar.add_cascade(label="Edit", menu=editmenu)
 
 
@@ -236,16 +236,6 @@ def resetSort():
     Main.context["sortKey"] = ""
     Main.context["sortReverse"] = False
     displayArray()
-
-
-def addRow():
-    """Adds a row to the table."""
-    Main.context["array"].append({key: "" for key in Main.context["array"][0]})
-    displayArray()
-
-
-def addColumn():
-    """Adds a column to the table."""
 
 
 def showStats(column):
@@ -314,3 +304,16 @@ def showStats(column):
         text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
         windowStats.mainloop()
+
+
+def addRow():
+    """Adds a row to the table."""
+    Main.context["array"].append({key: "" for key in Main.context["array"][0]})
+    displayArray()
+
+
+def addColumn():
+    """Adds a column to the table."""
+    for row in Main.context["array"]:
+        row["new_column"] = ""
+    displayArray()
