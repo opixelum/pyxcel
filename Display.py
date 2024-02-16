@@ -39,6 +39,7 @@ def createTable():
     for i in range(numRows):
         Main.window.grid_rowconfigure(i, weight=1)
 
+    # Keep track of the headers stringvars to update them on change
     for i, header in enumerate(Main.context["array"][0]):
         tmp = header
         # TODO: add sort icons with entries (maybe with a button on the right of the header?)
@@ -49,6 +50,12 @@ def createTable():
         #        tmp += " ▲"
         header_sv = tk.StringVar(value=tmp)
         header_entry = tk.Entry(Main.window, textvariable=header_sv)
+        header_entry.bind(
+            "<FocusOut>",
+            lambda *_, previous=header, sv=header_sv,: updateHeaderCellOnFocusOut(
+                previous, sv
+            ),
+        )
         header_entry.grid(row=0, column=i)
         header_entry.bind("<Button-3>", lambda _, x=header: makeRightClickMenu(x))
 
@@ -316,4 +323,21 @@ def addColumn():
     """Adds a column to the table."""
     for row in Main.context["array"]:
         row["new_column"] = ""
+    displayArray()
+
+
+def updateHeaderCellOnFocusOut(previous, sv):
+    """
+    Updates the context array when a header cell is modified.
+
+    parameters
+    ----------
+    previous: str
+        The previous value of the header.
+    sv: StringVar
+        The Tkinter StringVar object containing the new header name.
+    """
+    for row in Main.context["array"]:
+        row[sv.get()] = row.pop(previous)
+
     displayArray()
