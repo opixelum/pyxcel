@@ -52,9 +52,6 @@ def revertToOriginal():
 
 
 def createTable():
-    # copy the original array to be able to revert to it without linking the two arrays
-    Main.context["original"] = Main.context["array"].copy()
-
     numRows = max(len(Main.context["array"]) + 1, 10)
     numColumns = len(Main.context["array"][0])
 
@@ -108,7 +105,6 @@ def createTable():
 def openFile():
     file = filedialog.askopenfile()
     Main.context = {
-        "original": [],
         "array": [],
         "sortKey": "",
         "sortReverse": False,
