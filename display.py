@@ -26,7 +26,7 @@ def default_value(column_name):
 
 def update_value(row_number, column_name, value_string_var):
     new_value = value_string_var.get()
-
+    main.context["history"].append((row_number, column_name, main.context["data"][row_number][column_name]))
     if new_value == "":
         new_value = default_value(column_name)
 
@@ -50,6 +50,17 @@ def revert_to_original():
         main.context["data"] = file_parser.xml_to_data(main.context["file_path"])
     elif file_type == "yaml":
         main.context["data"] = file_parser.yaml_to_data(main.context["file_path"])
+    display_data()
+
+
+def revert_to_previous():
+    """
+    Reverts the array to its previous state (before the last modification).
+    """
+    if len(main.context["history"]) == 0:
+        return
+    row_number, column_name, previous_value = main.context["history"].pop()
+    main.context["data"][row_number][column_name] = previous_value
     display_data()
 
 
@@ -103,6 +114,7 @@ def open_file():
     main.context = {
         "sort_key": "",
         "sort_reverse": False,
+        "history": [],
     }
 
     file = filedialog.askopenfile()
@@ -241,10 +253,11 @@ def value_right_click_menu(header, row_number):
 
 def init_window():
     main.window = open_window("1000x500", "Pyxcel")
-    main.context = {"data": [], "sort_key": "", "sort_reverse": False, "file_path": ""}
+    main.context = {"data": [], "sort_key": "", "sort_reverse": False, "file_path": "", "history": []}
 
     # Shortcuts
     main.window.bind("<Control-s>", lambda _: save())
+    main.window.bind("<Control-z>", lambda _: revert_to_previous())
 
     display_data()
     main.window.mainloop()
@@ -431,5 +444,6 @@ def new_file():
         "sort_key": "",
         "sort_reverse": False,
         "file_path": "",
+        "history": [],
     }
     display_data()

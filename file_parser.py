@@ -77,6 +77,8 @@ def csv_to_data(file_path):
                 else:
                     if separator2 in value:
                         d[header[j]] = [str_to_type(k) for k in value.split(separator2)]
+                    else:
+                        d[header[j]] = str_to_type(value)
             res.append(d)
 
         return res
