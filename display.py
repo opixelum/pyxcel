@@ -178,10 +178,6 @@ def save_as():
         return
     file_type = file.name.split(".")[-1]
 
-    for i, row in enumerate(main.context["data"]):
-        for _, (key, _) in enumerate(row.items()):
-            row[key] = main.context["value_entry_vars"][i][key].get()
-
     main.context["file_path"] = file.name
 
     if file_type == "csv":
