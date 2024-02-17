@@ -26,10 +26,13 @@ def default_value(column_name):
 
 def update_value(row_number, column_name, value_string_var):
     new_value = value_string_var.get()
-    main.context["history"].append((row_number, column_name, main.context["data"][row_number][column_name]))
+
     if new_value == "":
         new_value = default_value(column_name)
 
+    main.context["history"].append(
+        (row_number, column_name, main.context["data"][row_number][column_name])
+    )
     main.context["data"][row_number][column_name] = new_value
     main.context["data"] = file_parser.unify_column_type(
         main.context["data"], column_name
@@ -252,7 +255,13 @@ def value_right_click_menu(header, row_number):
 
 def init_window():
     main.window = open_window("1000x500", "Pyxcel")
-    main.context = {"data": [], "sort_key": "", "sort_reverse": False, "file_path": "", "history": []}
+    main.context = {
+        "data": [],
+        "sort_key": "",
+        "sort_reverse": False,
+        "file_path": "",
+        "history": [],
+    }
 
     # Shortcuts
     main.window.bind("<Control-s>", lambda _: save())
