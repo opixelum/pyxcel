@@ -6,19 +6,28 @@ def filter_data(data, field, operator, value):
         "<=": lambda x, y: x <= y,
         ">": lambda x, y: x > y,
         ">=": lambda x, y: x >= y,
-        "contains": lambda x, y: y in x,
-        "startswith": lambda x, y: x.startswith(y),
-        "endswith": lambda x, y: x.endswith(y),
-        "list_contains": lambda x, y: y in x,
-        "list_min": lambda x, y: min(x) == y,
-        "list_max": lambda x, y: max(x) == y,
-        "list_avg_eq": lambda x, y: sum(x) / len(x) == y,
-        "list_avg_lt": lambda x, y: sum(x) / len(x) < y,
-        "list_avg_gt": lambda x, y: sum(x) / len(x) > y,
+        "contains": lambda x, y: x in y,
+        "starts with": lambda x, y: str.startswith(y, x),
+        "ends with": lambda x, y: str.endswith(y, x),
+        "list contains": lambda x, y: x in y,
+        "list min": lambda x, y: min(y) == x,
+        "list max": lambda x, y: max(y) == x,
+        "list avg eq": lambda x, y: sum(y) / len(y) == x,
+        "list avg lt": lambda x, y: sum(y) / len(y) < x,
+        "list avg gt": lambda x, y: sum(y) / len(y) > x,
     }
 
-    if field is None:
-        filter_data = [entry for entry in data if any(comparison_functions[operator](value, entry[field]) for field in entry)]
+    filter_data = []
+
+    if field == "all":
+        for entry in data:
+            for new_field in entry:
+                if comparison_functions[operator](value, entry[new_field]):
+                    filter_data.append(entry)
+                    break
     else:
-        filter_data = [entry for entry in data if comparison_functions[operator](entry[field], value)]
+        for entry in data:
+            if comparison_functions[operator](value, entry[field]):
+                filter_data.append(entry)
+
     return filter_data
