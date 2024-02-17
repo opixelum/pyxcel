@@ -11,8 +11,26 @@ def open_window(size, title):
     return w
 
 
+def default_value(column_name):
+    if file_parser.column_type(main.context["data"], column_name) == int:
+        return 0
+    elif file_parser.column_type(main.context["data"], column_name) == float:
+        return 0.0
+    elif file_parser.column_type(main.context["data"], column_name) == bool:
+        return False
+    elif file_parser.column_type(main.context["data"], column_name) == list:
+        return []
+    else:
+        return ""
+
+
 def update_value(row_number, column_name, value_string_var):
-    main.context["data"][row_number][column_name] = value_string_var.get()
+    new_value = value_string_var.get()
+
+    if new_value == "":
+        new_value = default_value(column_name)
+
+    main.context["data"][row_number][column_name] = new_value
     main.context["data"] = file_parser.unify_column_type(
         main.context["data"], column_name
     )
