@@ -101,28 +101,28 @@ def create_table():
                 value = str(value)[:-2]
 
             value_string_var = tk.StringVar(value=value)
-            cell = tk.Entry(main.window, textvariable=value_string_var)
-            cell.grid(row=row_number + 1, column=column_number)
-            cell.bind(
+            value_entry = tk.Entry(main.window, textvariable=value_string_var)
+            value_entry.grid(row=row_number + 1, column=column_number)
+            value_entry.bind(
                 "<Button-3>",
                 lambda _,
                 a=row_number,
                 b=column_name,
                 c=value_string_var: value_right_click_menu(a, b, c),
             )
-            cell.bind(
+            value_entry.bind(
                 "<FocusOut>",
                 lambda _, a=row_number, b=column_name, c=value_string_var: update_value(
                     a, b, c
                 ),
             )
-            cell.bind(
+            value_entry.bind(
                 "<Return>",
                 lambda _, a=row_number, b=column_name, c=value_string_var: update_value(
                     a, b, c
                 ),
             )
-            cell.bind(
+            value_entry.bind(
                 "<Control-z>",
                 lambda _, a=row_number, b=column_name, c=value_string_var: update_value(
                     a, b, c
@@ -180,7 +180,7 @@ def save_as():
 
     for i, row in enumerate(main.context["data"]):
         for _, (key, _) in enumerate(row.items()):
-            row[key] = main.context["cell_vars"][i][key].get()
+            row[key] = main.context["value_entry_vars"][i][key].get()
 
     main.context["file_path"] = file.name
 
