@@ -56,7 +56,7 @@ def revert_to_original():
     display_data()
 
 
-def revert_to_previous():
+def undo():
     """
     Reverts the array to its previous state (before the last modification).
     """
@@ -279,7 +279,7 @@ def init_window():
 
     # Shortcuts
     main.window.bind("<Control-s>", lambda _: save())
-    main.window.bind("<Control-z>", lambda _: revert_to_previous())
+    main.window.bind("<Control-z>", lambda _: undo())
 
     display_data()
     main.window.mainloop()
