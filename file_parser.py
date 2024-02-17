@@ -11,7 +11,10 @@ def isfloat(string):
         return False
 
 
-def stringToTypeOfValue(string):
+def str_to_type(string):
+    if string == "":
+        return string
+
     if string[0] == "-" or string[0] == "+" or string[0].isdigit():
         if string.isdigit():
             return int(string)
@@ -27,37 +30,41 @@ def stringToTypeOfValue(string):
     return string
 
 
-def jsonFileToArray(name):
-    with open(name, "r") as f:
+def json_to_data(file_path):
+    with open(file_path, "r") as f:
         return json.load(f)
 
 
-def arrayToJson(arr, name):
-    with open(name, "w") as f:
+def data_to_json(arr, file_path):
+    with open(file_path, "w") as f:
         json.dump(arr, f)
 
 
-def isCsvParser(i, separator):
-    if not i.isdigit() and not i.isalpha() and i != separator and i != "\n" and i != "\r" and i != "\"" and i != "'" and i != "." and i != "!" and i != "?" and i != "@":
-        return True
-    return False
+def is_csv_parser(character, separator):
+    special_chars = {"\n", "\r", '"', "'", ".", "!", "?", "@"}
+    return (
+        not character.isdigit()
+        and not character.isalpha()
+        and character not in special_chars.union({separator})
+    )
 
-def csvToArray(name):
+
+def csv_to_data(file_path):
     res = []
 
-    with open(name, "r") as f:
+    with open(file_path, "r") as f:
         t = f.read().split("\n")
         separator = ";"
-        for i in t[0]:
-            if isCsvParser(i, separator):
-                separator = i
+        for character in t[0]:
+            if is_csv_parser(character, separator):
+                separator = character
                 break
 
         header = t[0].split(separator)
         separator2 = ""
-        for i in t[1]:
-            if isCsvParser(i, separator):
-                separator2 = i
+        for character in t[1]:
+            if is_csv_parser(character, separator):
+                separator2 = character
                 break
         for i in t[1:]:
             if i == "":
@@ -66,19 +73,19 @@ def csvToArray(name):
             d = {}
             for j, value in enumerate(i.split(separator)):
                 if separator2 == "":
-                    d[header[j]] = stringToTypeOfValue(value)
+                    d[header[j]] = str_to_type(value)
                 else:
                     if separator2 in value:
-                        d[header[j]] = [stringToTypeOfValue(k) for k in value.split(separator2)]
+                        d[header[j]] = [str_to_type(k) for k in value.split(separator2)]
             res.append(d)
 
         return res
 
 
-def arrayToCsv(array, name):
-    header = [i for i in array[0]]
+def data_to_csv(data, file_path):
+    header = [i for i in data[0]]
     r = ";".join(header)
-    for i in array:
+    for i in data:
         line = []
         for j in header:
             if isinstance(i[j], list):
@@ -86,13 +93,13 @@ def arrayToCsv(array, name):
             else:
                 line.append(str(i[j]))
         r += "\n" + ";".join(line)
-    with open(name, "w") as f:
+    with open(file_path, "w") as f:
         f.write(r)
 
 
-def arrayToXml(array, name):
+def data_to_xml(data, file_path):
     root = ET.Element("root")
-    for i in array:
+    for i in data:
         child = ET.Element("row")
         root.append(child)
         for j in i:
@@ -100,45 +107,45 @@ def arrayToXml(array, name):
             child2.text = str(i[j])
             child.append(child2)
     tree = ET.ElementTree(root)
-    tree.write(name)
+    tree.write(file_path)
 
 
-def xmlToArray(name):
-    root = ET.parse(name).getroot()
+def xml_to_data(file_path):
+    root = ET.parse(file_path).getroot()
     res = []
     for i in root:
         d = {}
         for j in i:
-            d[j.tag] = stringToTypeOfValue(j.text)
+            d[j.tag] = str_to_type(j.text)
         res.append(d)
     return res
 
 
-def yamlToArray(name):
-    with open(name, "r") as f:
+def yaml_to_data(file_path):
+    with open(file_path, "r") as f:
         arr = yaml.safe_load(f)
     return arr
 
 
-def arrayToYaml(array, name):
-    with open(name, "w") as f:
-        yaml.dump(array, f)
+def data_to_yaml(data, file_path):
+    with open(file_path, "w") as f:
+        yaml.dump(data, f)
 
 
-def columnType(array, column):
+def column_type(data, column_name):
     has_bool = False
     has_int = False
     has_float = False
 
-    for row in array:
-        row[column] = stringToTypeOfValue(str(row[column]))
-        if isinstance(row[column], str):
+    for row in data:
+        row[column_name] = str_to_type(str(row[column_name]))
+        if isinstance(row[column_name], str):
             return str
-        if isinstance(row[column], bool):
+        if isinstance(row[column_name], bool):
             has_bool = True
-        if isinstance(row[column], int):
+        if isinstance(row[column_name], int):
             has_int = True
-        if isinstance(row[column], float):
+        if isinstance(row[column_name], float):
             has_float = True
 
     if has_bool and not has_int and not has_float:
@@ -153,24 +160,24 @@ def columnType(array, column):
     return str
 
 
-def setColumnToSameType(array, column):
+def unify_column_type(data, column_name):
     """
     Set all the values in a column to the same type:
     - If there it contains only "true" or "false" then it will be converted to boolean;
     - If it contains only digits then it will be converted to int or float (depending if it has a dot or not);
     - Else, it will be left as a string.
     """
-    if columnType(array, column) == str:
-        for row in array:
-            row[column] = str(row[column])
-    elif columnType(array, column) == bool:
-        for row in array:
-            row[column] = bool(row[column])
-    elif columnType(array, column) == float:
-        for row in array:
-            row[column] = float(row[column])
-    elif columnType(array, column) == int:
-        for row in array:
-            row[column] = int(row[column])
+    if column_type(data, column_name) == str:
+        for row in data:
+            row[column_name] = str(row[column_name])
+    elif column_type(data, column_name) == bool:
+        for row in data:
+            row[column_name] = bool(row[column_name])
+    elif column_type(data, column_name) == float:
+        for row in data:
+            row[column_name] = float(row[column_name])
+    elif column_type(data, column_name) == int:
+        for row in data:
+            row[column_name] = int(row[column_name])
 
-    return array
+    return data
