@@ -91,6 +91,10 @@ def open_file():
 
         main.context["file_path"] = file.name
 
+        # Update window title
+        file_name = file.name.split("/")[-1]
+        main.window.title(file_name + " - Pyxcel")
+
         if file_type == "csv":
             main.context["data"] = file_parser.csv_to_data(file.name)
         elif file_type == "json":
