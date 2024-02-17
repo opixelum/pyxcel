@@ -61,6 +61,9 @@ def revert_to_previous():
         return
     row_number, column_name, previous_value = main.context["history"].pop()
     main.context["data"][row_number][column_name] = previous_value
+    main.context["data"] = file_parser.unify_column_type(
+        main.context["data"], column_name
+    )
     display_data()
 
 
