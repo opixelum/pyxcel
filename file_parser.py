@@ -41,7 +41,7 @@ def data_to_json(arr, file_path):
 
 
 def is_csv_parser(character, separator):
-    special_chars = {"\n", "\r", '"', "'", ".", "!", "?", "@"}
+    special_chars = {"\n", "\r", '"', "'", ".", "!", "?", "@", " "}
     return (
         not character.isdigit()
         and not character.isalpha()
