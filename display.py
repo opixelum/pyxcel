@@ -79,18 +79,18 @@ def create_table():
     for i in range(number_of_rows):
         main.window.grid_rowconfigure(i, weight=1)
 
-    # Keep track of the headers stringvars to update them on change
+    # Keep track of the column_names stringvars to update them on change
     for column_number, column_name in enumerate(main.context["data"][0]):
-        header_sv = tk.StringVar(value=column_name)
-        header_entry = tk.Entry(main.window, textvariable=header_sv)
-        header_entry.bind(
+        column_name_sv = tk.StringVar(value=column_name)
+        column_name_entry = tk.Entry(main.window, textvariable=column_name_sv)
+        column_name_entry.bind(
             "<FocusOut>",
-            lambda _, previous=column_name, sv=header_sv,: update_column_name(
+            lambda _, previous=column_name, sv=column_name_sv,: update_column_name(
                 previous, sv
             ),
         )
-        header_entry.grid(row=0, column=column_number)
-        header_entry.bind(
+        column_name_entry.grid(row=0, column=column_number)
+        column_name_entry.bind(
             "<Button-3>", lambda _, x=column_name: column_name_right_click_menu(x)
         )
 
@@ -105,7 +105,10 @@ def create_table():
             cell.grid(row=row_number + 1, column=column_number)
             cell.bind(
                 "<Button-3>",
-                lambda _, x=column_name, row=row_number: value_right_click_menu(x, row),
+                lambda _,
+                a=row_number,
+                b=column_name,
+                c=value_string_var: value_right_click_menu(a, b, c),
             )
             cell.bind(
                 "<FocusOut>",
@@ -235,25 +238,31 @@ def create_menus():
     menubar.add_cascade(label="Edit", menu=editmenu)
 
 
-def column_name_right_click_menu(header):
+def column_name_right_click_menu(column_name):
     rightClickMenu = tk.Menu(main.window, tearoff=0)
-    rightClickMenu.add_command(label="Show Stats", command=lambda: show_stats(header))
-    rightClickMenu.add_command(label="Sort", command=lambda: sort_data(header))
     rightClickMenu.add_command(
-        label="Delete Column", command=lambda: delete_column(header)
+        label="Show Stats", command=lambda: show_stats(column_name)
+    )
+    rightClickMenu.add_command(label="Sort", command=lambda: sort_data(column_name))
+    rightClickMenu.add_command(
+        label="Delete Column", command=lambda: delete_column(column_name)
     )
     rightClickMenu.post(main.window.winfo_pointerx(), main.window.winfo_pointery())
 
 
-def value_right_click_menu(header, row_number):
+def value_right_click_menu(row_number, column_name, value_string_var):
+    update_value(row_number, column_name, value_string_var)
+
     rightClickMenu = tk.Menu(main.window, tearoff=0)
-    rightClickMenu.add_command(label="Show Stats", command=lambda: show_stats(header))
-    rightClickMenu.add_command(label="Sort", command=lambda: sort_data(header))
+    rightClickMenu.add_command(
+        label="Show Stats", command=lambda: show_stats(column_name)
+    )
+    rightClickMenu.add_command(label="Sort", command=lambda: sort_data(column_name))
     rightClickMenu.add_command(
         label="Delete Row", command=lambda: delete_row(row_number)
     )
     rightClickMenu.add_command(
-        label="Delete Column", command=lambda: delete_column(header)
+        label="Delete Column", command=lambda: delete_column(column_name)
     )
     rightClickMenu.post(main.window.winfo_pointerx(), main.window.winfo_pointery())
 
@@ -436,7 +445,7 @@ def update_column_name(previous, sv):
     for row in main.context["data"]:
         row[sv.get()] = row.pop(previous)
 
-    # Need to update the header name on the frontend
+    # Need to update the column_name name on the frontend
     display_data()
 
 
@@ -445,9 +454,9 @@ def delete_row(row_number):
     display_data()
 
 
-def delete_column(header):
+def delete_column(column_name):
     for row in main.context["data"]:
-        row.pop(header)
+        row.pop(column_name)
     display_data()
 
 
