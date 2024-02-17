@@ -2,8 +2,8 @@ import tkinter as tk
 from tkinter import filedialog
 
 import file_parser
-import main
 import filters
+import main
 
 
 def OpenWindow(size, title):
@@ -307,19 +307,17 @@ def add_search_bar():
 
     search_frame = tk.Frame(new_window)
     search_frame.grid(row=0, column=len(main.context["columns"]))
-    
-    arraydemerde = ["all", "gravity", "chance", "fence", "round", "lonely", "method"]
 
+    arraydemerde = ["all", "gravity", "chance", "fence", "round", "lonely", "method"]
 
     # Field dropdown
     field_label = tk.Label(search_frame, text="Field:")
     field_label.grid(row=0, column=0, padx=5, pady=5)
-    field_options = arraydemerde #main.context["columns"] if main.context["columns"] else ["all"]
+    field_options = arraydemerde  # main.context["columns"] if main.context["columns"] else ["all"]
     field_var = tk.StringVar(search_frame)
     field_var.set(field_options[0])  # Set a default value
     field_dropdown = tk.OptionMenu(search_frame, field_var, *field_options)
     field_dropdown.grid(row=0, column=1, padx=5, pady=5)
-
 
     # Operator dropdown
     operator_label = tk.Label(search_frame, text="Operator:")
@@ -355,12 +353,14 @@ def apply_search(field, operator, value):
     main.context["array"] = filters.filter_data(main.context["array"], field, operator, value)
     displayArray()
 
+
 def reset_filters():
     if main.save_array_filters == []:
         return
     main.context["array"] = main.save_array_filters[0]
     main.save_array_filters = []
     displayArray()
+
 
 def undo_filters():
     if main.save_array_filters == []:
