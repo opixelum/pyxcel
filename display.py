@@ -54,12 +54,12 @@ def revert_to_original():
 
 
 def create_table():
-    numRows = max(len(main.context["data"]) + 1, 10)
-    numColumns = len(main.context["data"][0])
+    number_of_rows = max(len(main.context["data"]) + 1, 10)
+    number_of_columns = len(main.context["data"][0])
 
-    for i in range(numColumns):
+    for i in range(number_of_columns):
         main.window.grid_columnconfigure(i, weight=1)
-    for i in range(numRows):
+    for i in range(number_of_rows):
         main.window.grid_rowconfigure(i, weight=1)
 
     # Keep track of the headers stringvars to update them on change
@@ -79,6 +79,10 @@ def create_table():
 
     for row_number, row in enumerate(main.context["data"]):
         for column_number, (column_name, value) in enumerate(row.items()):
+            # If the value is a number ending with .0, display it as an integer
+            if str(value)[-2:] == ".0":
+                value = str(value)[:-2]
+
             value_string_var = tk.StringVar(value=value)
             value_string_var.trace_add(
                 "write",
@@ -302,6 +306,16 @@ def show_stats(column):
             avg += i[column]
 
         avg /= len(main.context["data"])
+
+        if str(min)[-2:] == ".0":
+            min = int(str(min)[:-2])
+
+        if str(max)[-2:] == ".0":
+            max = int(str(max)[:-2])
+
+        if str(avg)[-2:] == ".0":
+            avg = int(str(avg)[:-2])
+
         text = tk.Label(
             windowStats,
             text="Min: " + str(min) + "\nMax: " + str(max) + "\nAvg: " + str(avg),
@@ -347,6 +361,16 @@ def show_stats(column):
             avg += len(i[column])
 
         avg /= len(main.context["data"])
+
+        if str(min)[-2:] == ".0":
+            min = int(str(min)[:-2])
+
+        if str(max)[-2:] == ".0":
+            max = int(str(max)[:-2])
+
+        if str(avg)[-2:] == ".0":
+            avg = int(str(avg)[:-2])
+
         min_text = (
             "Min "
             + ("list" if column_type == list else "string")
