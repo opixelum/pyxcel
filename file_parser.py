@@ -181,17 +181,34 @@ def unify_column_type(data, column_name):
         updated_row = row.copy()
         original_value = row[column_name]
 
+        # Ensure the conversion logic checks for string type before calling .lower()
         if target_type == str:
-            # If the target type is str, ensure all values are treated as strings
             converted_value = str(original_value)
         elif target_type == int:
-            converted_value = int(
-                float(original_value)
-            )  # Convert via float for cases like '3.0'
+            try:
+                converted_value = int(
+                    float(original_value)
+                )  # Convert via float for cases like '3.0'
+            except ValueError:
+                converted_value = (
+                    original_value  # Preserve original in case of conversion error
+                )
         elif target_type == float:
-            converted_value = float(original_value)
+            try:
+                converted_value = float(original_value)
+            except ValueError:
+                converted_value = original_value
         elif target_type == bool:
-            converted_value = original_value.lower() == "true"
+            # Correctly handle boolean conversion by first ensuring it's a string
+            if isinstance(original_value, str):
+                converted_value = original_value.lower() == "true"
+            else:
+                # If it's already a boolean, no conversion is needed; otherwise, it cannot be a boolean
+                converted_value = (
+                    original_value
+                    if isinstance(original_value, bool)
+                    else str(original_value)
+                )
 
         updated_row[column_name] = converted_value
         updated_data.append(updated_row)
