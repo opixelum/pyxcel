@@ -168,10 +168,10 @@ def save_as():
     file = filedialog.asksaveasfile(
         defaultextension=".csv",
         filetypes=[
-            ("CSV files", "*.csv"),
-            ("JSON files", "*.json"),
-            ("XML files", "*.xml"),
-            ("YAML files", "*.yaml"),
+            ("CSV file", ".csv"),
+            ("JSON file", ".json"),
+            ("XML file", ".xml"),
+            ("YAML file", ".yaml"),
         ],
     )
     if file is None:
