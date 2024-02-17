@@ -12,6 +12,9 @@ def isfloat(string):
 
 
 def str_to_type(string):
+    if string == "":
+        return string
+
     if string[0] == "-" or string[0] == "+" or string[0].isdigit():
         if string.isdigit():
             return int(string)
