@@ -100,6 +100,12 @@ def create_table():
             if str(value)[-2:] == ".0":
                 value = str(value)[:-2]
 
+            # If value are boolean, display it as True or False
+            if str(value).lower() == "true":
+                value = "True"
+            elif str(value).lower() == "false":
+                value = "False"
+
             value_string_var = tk.StringVar(value=value)
             value_entry = tk.Entry(main.window, textvariable=value_string_var)
             value_entry.grid(row=row_number + 1, column=column_number)
