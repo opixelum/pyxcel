@@ -27,25 +27,38 @@ def str_to_type(string):
     return string
 
 
-def json_to_data(name):
-    with open(name, "r") as f:
+def json_to_data(file_path):
+    with open(file_path, "r") as f:
         return json.load(f)
 
 
-def data_to_json(arr, name):
-    with open(name, "w") as f:
+def data_to_json(arr, file_path):
+    with open(file_path, "w") as f:
         json.dump(arr, f)
 
 
 def is_csv_parser(i, separator):
-    if not i.isdigit() and not i.isalpha() and i != separator and i != "\n" and i != "\r" and i != "\"" and i != "'" and i != "." and i != "!" and i != "?" and i != "@":
+    if (
+        not i.isdigit()
+        and not i.isalpha()
+        and i != separator
+        and i != "\n"
+        and i != "\r"
+        and i != '"'
+        and i != "'"
+        and i != "."
+        and i != "!"
+        and i != "?"
+        and i != "@"
+    ):
         return True
     return False
 
-def csv_to_data(name):
+
+def csv_to_data(file_path):
     res = []
 
-    with open(name, "r") as f:
+    with open(file_path, "r") as f:
         t = f.read().split("\n")
         separator = ";"
         for i in t[0]:
@@ -75,10 +88,10 @@ def csv_to_data(name):
         return res
 
 
-def data_to_csv(array, name):
-    header = [i for i in array[0]]
+def data_to_csv(data, file_path):
+    header = [i for i in data[0]]
     r = ";".join(header)
-    for i in array:
+    for i in data:
         line = []
         for j in header:
             if isinstance(i[j], list):
@@ -86,13 +99,13 @@ def data_to_csv(array, name):
             else:
                 line.append(str(i[j]))
         r += "\n" + ";".join(line)
-    with open(name, "w") as f:
+    with open(file_path, "w") as f:
         f.write(r)
 
 
-def data_to_xml(array, name):
+def data_to_xml(data, file_path):
     root = ET.Element("root")
-    for i in array:
+    for i in data:
         child = ET.Element("row")
         root.append(child)
         for j in i:
@@ -100,11 +113,11 @@ def data_to_xml(array, name):
             child2.text = str(i[j])
             child.append(child2)
     tree = ET.ElementTree(root)
-    tree.write(name)
+    tree.write(file_path)
 
 
-def xml_to_data(name):
-    root = ET.parse(name).getroot()
+def xml_to_data(file_path):
+    root = ET.parse(file_path).getroot()
     res = []
     for i in root:
         d = {}
@@ -114,31 +127,31 @@ def xml_to_data(name):
     return res
 
 
-def yaml_to_data(name):
-    with open(name, "r") as f:
+def yaml_to_data(file_path):
+    with open(file_path, "r") as f:
         arr = yaml.safe_load(f)
     return arr
 
 
-def data_to_yaml(array, name):
-    with open(name, "w") as f:
-        yaml.dump(array, f)
+def data_to_yaml(data, file_path):
+    with open(file_path, "w") as f:
+        yaml.dump(data, f)
 
 
-def column_type(array, column):
+def column_type(data, column_name):
     has_bool = False
     has_int = False
     has_float = False
 
-    for row in array:
-        row[column] = str_to_type(str(row[column]))
-        if isinstance(row[column], str):
+    for row in data:
+        row[column_name] = str_to_type(str(row[column_name]))
+        if isinstance(row[column_name], str):
             return str
-        if isinstance(row[column], bool):
+        if isinstance(row[column_name], bool):
             has_bool = True
-        if isinstance(row[column], int):
+        if isinstance(row[column_name], int):
             has_int = True
-        if isinstance(row[column], float):
+        if isinstance(row[column_name], float):
             has_float = True
 
     if has_bool and not has_int and not has_float:
@@ -153,24 +166,24 @@ def column_type(array, column):
     return str
 
 
-def unify_column_type(array, column):
+def unify_column_type(data, column_name):
     """
     Set all the values in a column to the same type:
     - If there it contains only "true" or "false" then it will be converted to boolean;
     - If it contains only digits then it will be converted to int or float (depending if it has a dot or not);
     - Else, it will be left as a string.
     """
-    if column_type(array, column) == str:
-        for row in array:
-            row[column] = str(row[column])
-    elif column_type(array, column) == bool:
-        for row in array:
-            row[column] = bool(row[column])
-    elif column_type(array, column) == float:
-        for row in array:
-            row[column] = float(row[column])
-    elif column_type(array, column) == int:
-        for row in array:
-            row[column] = int(row[column])
+    if column_type(data, column_name) == str:
+        for row in data:
+            row[column_name] = str(row[column_name])
+    elif column_type(data, column_name) == bool:
+        for row in data:
+            row[column_name] = bool(row[column_name])
+    elif column_type(data, column_name) == float:
+        for row in data:
+            row[column_name] = float(row[column_name])
+    elif column_type(data, column_name) == int:
+        for row in data:
+            row[column_name] = int(row[column_name])
 
-    return array
+    return data
