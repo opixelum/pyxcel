@@ -135,51 +135,82 @@ def data_to_yaml(data, file_path):
 
 
 def column_type(data, column_name):
-    has_bool = False
-    has_int = False
+    has_numeric = False
     has_float = False
+    has_strictly_bool = False
+    has_non_numeric_or_bool = False  # Flag for any non-numeric and non-boolean string
 
     for row in data:
-        row[column_name] = str_to_type(str(row[column_name]))
-        if isinstance(row[column_name], str):
-            return str
-        if isinstance(row[column_name], bool):
-            has_bool = True
-        if isinstance(row[column_name], int):
-            has_int = True
-        if isinstance(row[column_name], float):
-            has_float = True
+        value = str(
+            row[column_name]
+        ).strip()  # Convert value to string and strip whitespace
+        lower_value = value.lower()
 
-    if has_bool and not has_int and not has_float:
-        return bool
+        # Check if the string is a boolean value
+        if lower_value in ["true", "false"]:
+            has_strictly_bool = True
+        else:
+            try:
+                # Attempt to convert the string to a float
+                float(value)
+                has_numeric = True
+                if "." in value or "e" in lower_value or "E" in value:
+                    has_float = True
+            except ValueError:
+                # If conversion fails, it's not a valid numeric string
+                has_non_numeric_or_bool = True
 
-    if has_float:
-        return float
-
-    if has_int:
-        return int
-
-    return str
+    # Decision logic for determining column type
+    if has_non_numeric_or_bool:
+        return str  # Any non-numeric/non-boolean string forces the whole column to be strings
+    elif has_numeric:
+        return (
+            float if has_float else int
+        )  # Numeric values, prefer float if any decimal points
+    elif has_strictly_bool:
+        return bool  # Only boolean values
+    else:
+        return str  # Default to string if none of the above conditions are met
 
 
 def unify_column_type(data, column_name):
-    """
-    Set all the values in a column to the same type:
-    - If there it contains only "true" or "false" then it will be converted to boolean;
-    - If it contains only digits then it will be converted to int or float (depending if it has a dot or not);
-    - Else, it will be left as a string.
-    """
-    if column_type(data, column_name) == str:
-        for row in data:
-            row[column_name] = str(row[column_name])
-    elif column_type(data, column_name) == bool:
-        for row in data:
-            row[column_name] = bool(row[column_name])
-    elif column_type(data, column_name) == float:
-        for row in data:
-            row[column_name] = float(row[column_name])
-    elif column_type(data, column_name) == int:
-        for row in data:
-            row[column_name] = int(row[column_name])
+    target_type = column_type(data, column_name)
+    updated_data = []
 
-    return data
+    for row in data:
+        updated_row = row.copy()
+        original_value = row[column_name]
+
+        # Ensure the conversion logic checks for string type before calling .lower()
+        if target_type == str:
+            converted_value = str(original_value)
+        elif target_type == int:
+            try:
+                converted_value = int(
+                    float(original_value)
+                )  # Convert via float for cases like '3.0'
+            except ValueError:
+                converted_value = (
+                    original_value  # Preserve original in case of conversion error
+                )
+        elif target_type == float:
+            try:
+                converted_value = float(original_value)
+            except ValueError:
+                converted_value = original_value
+        elif target_type == bool:
+            # Correctly handle boolean conversion by first ensuring it's a string
+            if isinstance(original_value, str):
+                converted_value = original_value.lower() == "true"
+            else:
+                # If it's already a boolean, no conversion is needed; otherwise, it cannot be a boolean
+                converted_value = (
+                    original_value
+                    if isinstance(original_value, bool)
+                    else str(original_value)
+                )
+
+        updated_row[column_name] = converted_value
+        updated_data.append(updated_row)
+
+    return updated_data
