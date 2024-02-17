@@ -174,10 +174,6 @@ def save():
 
     file_type = main.context["file_path"].split(".")[-1]
 
-    for i, row in enumerate(main.context["data"]):
-        for _, (key, _) in enumerate(row.items()):
-            row[key] = main.context["cell_vars"][i][key].get()
-
     if file_type == "csv":
         file_parser.data_to_csv(main.context["data"], main.context["file_path"])
     elif file_type == "json":
