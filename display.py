@@ -122,6 +122,12 @@ def create_table():
                     a, b, c
                 ),
             )
+            cell.bind(
+                "<Control-z>",
+                lambda _, a=row_number, b=column_name, c=value_string_var: update_value(
+                    a, b, c
+                ),
+            )
 
 
 def open_file():
