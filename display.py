@@ -132,6 +132,7 @@ def create_table():
 
 def open_file():
     main.context = {
+        "data": [],
         "sort_key": "",
         "sort_reverse": False,
         "history": [],
