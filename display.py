@@ -101,18 +101,25 @@ def create_table():
                 value = str(value)[:-2]
 
             value_string_var = tk.StringVar(value=value)
-            value_string_var.trace_add(
-                "write",
-                lambda *_,
-                a=row_number,
-                b=column_name,
-                c=value_string_var: update_value(a, b, c),
-            )
             cell = tk.Entry(main.window, textvariable=value_string_var)
             cell.grid(row=row_number + 1, column=column_number)
             cell.bind(
                 "<Button-3>",
                 lambda _, x=column_name, row=row_number: value_right_click_menu(x, row),
+            )
+            cell.bind(
+                "<FocusOut>", 
+                lambda *_,
+                a=row_number,
+                b=column_name,
+                c=value_string_var: update_value(a, b, c),
+            )
+            cell.bind(
+                "<Return>", 
+                lambda *_,
+                a=row_number,
+                b=column_name,
+                c=value_string_var: update_value(a, b, c),
             )
 
 
