@@ -13,6 +13,9 @@ def open_window(size, title):
 
 def update_value(row_number, column_name, value_string_var):
     main.context["data"][row_number][column_name] = value_string_var.get()
+    main.context["data"] = file_parser.unify_column_type(
+        main.context["data"], column_name
+    )
 
 
 def revert_to_original():
