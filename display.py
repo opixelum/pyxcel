@@ -85,7 +85,7 @@ def create_table():
         header_entry = tk.Entry(main.window, textvariable=header_sv)
         header_entry.bind(
             "<FocusOut>",
-            lambda *_, previous=column_name, sv=header_sv,: update_column_name(
+            lambda _, previous=column_name, sv=header_sv,: update_column_name(
                 previous, sv
             ),
         )
@@ -108,18 +108,16 @@ def create_table():
                 lambda _, x=column_name, row=row_number: value_right_click_menu(x, row),
             )
             cell.bind(
-                "<FocusOut>", 
-                lambda *_,
-                a=row_number,
-                b=column_name,
-                c=value_string_var: update_value(a, b, c),
+                "<FocusOut>",
+                lambda _, a=row_number, b=column_name, c=value_string_var: update_value(
+                    a, b, c
+                ),
             )
             cell.bind(
-                "<Return>", 
-                lambda *_,
-                a=row_number,
-                b=column_name,
-                c=value_string_var: update_value(a, b, c),
+                "<Return>",
+                lambda _, a=row_number, b=column_name, c=value_string_var: update_value(
+                    a, b, c
+                ),
             )
 
 
