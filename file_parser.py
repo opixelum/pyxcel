@@ -40,22 +40,13 @@ def data_to_json(arr, file_path):
         json.dump(arr, f)
 
 
-def is_csv_parser(i, separator):
-    if (
-        not i.isdigit()
-        and not i.isalpha()
-        and i != separator
-        and i != "\n"
-        and i != "\r"
-        and i != '"'
-        and i != "'"
-        and i != "."
-        and i != "!"
-        and i != "?"
-        and i != "@"
-    ):
-        return True
-    return False
+def is_csv_parser(character, separator):
+    special_chars = {"\n", "\r", '"', "'", ".", "!", "?", "@"}
+    return (
+        not character.isdigit()
+        and not character.isalpha()
+        and character not in special_chars.union({separator})
+    )
 
 
 def csv_to_data(file_path):
@@ -64,16 +55,16 @@ def csv_to_data(file_path):
     with open(file_path, "r") as f:
         t = f.read().split("\n")
         separator = ";"
-        for i in t[0]:
-            if is_csv_parser(i, separator):
-                separator = i
+        for character in t[0]:
+            if is_csv_parser(character, separator):
+                separator = character
                 break
 
         header = t[0].split(separator)
         separator2 = ""
-        for i in t[1]:
-            if is_csv_parser(i, separator):
-                separator2 = i
+        for character in t[1]:
+            if is_csv_parser(character, separator):
+                separator2 = character
                 break
         for i in t[1:]:
             if i == "":
