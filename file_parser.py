@@ -148,7 +148,6 @@ def column_type(data, column_name):
         value = str_to_type(str(
             row[column_name]
         ).strip())  # Convert value to string and strip whitespace
-        print(type(value))
         if isinstance(value, list):
             return list
         # Check if the string is a boolean value
@@ -188,8 +187,6 @@ def unify_column_type(data, column_name):
 
         # Ensure the conversion logic checks for string type before calling .lower()
         if target_type == list:
-            print(original_value)
-            print(type(original_value))
             # Convert each element in the list to the target type
             if original_value[0] == "[" and original_value[-1] == "]":
                 converted_value = original_value[1:-1].split(",")
@@ -197,8 +194,6 @@ def unify_column_type(data, column_name):
                 converted_value = original_value
             else:
                 converted_value = [original_value]
-            print(converted_value)
-            print(type(converted_value))
         elif target_type == str:
             converted_value = str(original_value)
         elif target_type == int:
