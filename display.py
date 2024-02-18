@@ -176,7 +176,7 @@ def makeMenu():
     editmenu.add_command(label="Add row", command=lambda: addRow())
     menubar.add_cascade(label="Edit", menu=editmenu)
     filtermenu = tk.Menu(menubar, tearoff=0)
-    filtermenu.add_command(label="Add filter", command=lambda: add_search_bar())
+    filtermenu.add_command(label="Add filter", command=lambda: add_search_bar(None))
     filtermenu.add_command(label="Undo filters", command=lambda: undo_filters())
     filtermenu.add_command(label="Reset filters", command=lambda: reset_filters())
     menubar.add_cascade(label="Filter", menu=filtermenu)
@@ -302,20 +302,23 @@ def showStats(column):
         text.pack()
 
 
-def add_search_bar():
+def add_search_bar(new_field_var):
     new_window = OpenWindow("300x300", "Search")
 
     search_frame = tk.Frame(new_window)
     search_frame.grid(row=0, column=len(main.context["columns"]))
 
-    arraydemerde = ["all", "gravity", "chance", "fence", "round", "lonely", "method"]
-
     # Field dropdown
     field_label = tk.Label(search_frame, text="Field:")
     field_label.grid(row=0, column=0, padx=5, pady=5)
-    field_options = arraydemerde  # main.context["columns"] if main.context["columns"] else ["all"]
-    field_var = tk.StringVar(search_frame)
-    field_var.set(field_options[0])  # Set a default value
+    field_options = main.context["columns"] if main.context["columns"] else ["all"]
+    if new_field_var != None:
+        field_var = tk.StringVar(search_frame)
+        field_var.set(new_field_var)
+    else:
+        field_var = tk.StringVar(search_frame)
+        field_var.set(field_options[0])  # Set a default value
+    field_var.trace_add("write", lambda *_, x=field_var: update_dropdown(x, new_window))
     field_dropdown = tk.OptionMenu(search_frame, field_var, *field_options)
     field_dropdown.grid(row=0, column=1, padx=5, pady=5)
 
@@ -346,6 +349,11 @@ def add_search_bar():
     send_button.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
 
     new_window.mainloop()
+
+
+def update_dropdown(x, window):
+    window.destroy()
+    add_search_bar(x.get())
 
 
 def apply_search(field, operator, value):
