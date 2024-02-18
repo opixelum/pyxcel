@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+import copy
 
 import file_parser
 import filters
@@ -31,10 +32,7 @@ def update_value(row_number, column_name, value_string_var):
 
     if new_value == "":
         new_value = default_value(column_name)
-
-    main.context["history"].append(
-        (row_number, column_name, main.context["data"][row_number][column_name])
-    )
+    main.context["history"].append(copy.deepcopy(main.context["data"]))
     main.context["data"][row_number][column_name] = new_value
     main.context["data"] = file_parser.unify_column_type(
         main.context["data"], column_name
@@ -64,11 +62,8 @@ def undo():
     """
     if len(main.context["history"]) == 0:
         return
-    row_number, column_name, previous_value = main.context["history"].pop()
-    main.context["data"][row_number][column_name] = previous_value
-    main.context["data"] = file_parser.unify_column_type(
-        main.context["data"], column_name
-    )
+    array = main.context["history"].pop()
+    main.context["data"] = array
     display_data()
 
 
@@ -468,11 +463,13 @@ def update_column_name(previous, sv):
 
 
 def delete_row(row_number):
+    main.context["history"].append(copy.deepcopy(main.context["data"]))
     main.context["data"].pop(row_number)
     display_data()
 
 
 def delete_column(column_name):
+    main.context["history"].append(copy.deepcopy(main.context["data"]))
     for row in main.context["data"]:
         row.pop(column_name)
     display_data()
