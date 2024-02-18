@@ -28,6 +28,9 @@ def str_to_type(string):
     if string == "False" or string == "false":
         return False
 
+    if string[0] == "[" and string[-1] == "]":
+        return string[1:-1].split(", ")
+
     return string
 
 
