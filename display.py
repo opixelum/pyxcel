@@ -477,15 +477,12 @@ def add_search_bar(new_field_var):
             "starts with",
             "ends with",
             "list contains",
-            "list min",
-            "list max",
-            "list avg eq",
-            "list avg lt",
-            "list avg gt",
+            "list min size",
+            "list max size",
         ]
     else:
         if isinstance(main.context["data"][0][field_var.get()], list):
-            operator_options = ["list contains", "list min", "list max", "list avg eq", "list avg lt", "list avg gt"]
+            operator_options = ["list contains", "list min size", "list max size"]
         elif isinstance(main.context["data"][0][field_var.get()], str):
             operator_options = ["contains", "starts with", "ends with"]
         else:

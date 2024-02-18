@@ -9,12 +9,9 @@ def filter_data(data, field, operator, value):
         "contains": lambda x, y: x in y,
         "starts with": lambda x, y: str.startswith(y, x),
         "ends with": lambda x, y: str.endswith(y, x),
-        "list contains": lambda x, y: x in y,
-        "list min": lambda x, y: min(y) == x,
-        "list max": lambda x, y: max(y) == x,
-        "list avg eq": lambda x, y: sum(y) / len(y) == x,
-        "list avg lt": lambda x, y: sum(y) / len(y) < x,
-        "list avg gt": lambda x, y: sum(y) / len(y) > x,
+        "list contains": lambda x, y: x in [str(z) for z in y],
+        "list min size": lambda x, y: len(y) >= int(x),
+        "list max size": lambda x, y: len(y) <= int(x),
     }
 
     filter_data = []
