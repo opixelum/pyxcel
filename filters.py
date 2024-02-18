@@ -22,15 +22,29 @@ def filter_data(data, field, operator, value):
     if field == "all":
         for entry in data:
             for new_field in entry:
-                if operator != "=" and operator != "!=" and operator != "<" and operator != "<=" and operator != ">" and operator != ">=":
-                    if not isinstance(entry[new_field], (int, float)):
+                if operator == "contains" or operator == "starts with" or operator == "ends with":
+                    if isinstance(entry[new_field], str):
+                        if comparison_functions[operator](value, entry[new_field]):
+                            filter_data.append(entry)
+                            break
+                elif (
+                    operator == "list contains"
+                    or operator == "list min"
+                    or operator == "list max"
+                    or operator == "list avg eq"
+                    or operator == "list avg lt"
+                    or operator == "list avg gt"
+                ):
+                    if isinstance(entry[new_field], list):
                         if comparison_functions[operator](value, entry[new_field]):
                             filter_data.append(entry)
                             break
                 else:
-                    if comparison_functions[operator](value, entry[new_field]):
-                        filter_data.append(entry)
-                        break
+                    if isinstance(entry[new_field], (int, float)):
+                        if comparison_functions[operator](value, entry[new_field]):
+                            filter_data.append(entry)
+                            break
+
     else:
         for entry in data:
             if comparison_functions[operator](value, entry[field]):
