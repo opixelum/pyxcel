@@ -34,9 +34,7 @@ def update_value(row_number, column_name, value_string_var):
         new_value = default_value(column_name)
     main.context["history"].append(copy.deepcopy(main.context["data"]))
     main.context["data"][row_number][column_name] = new_value
-    main.context["data"] = file_parser.unify_column_type(
-        main.context["data"], column_name
-    )
+    main.context["data"] = file_parser.unify_column_type(main.context["data"], column_name)
 
 
 def revert_to_original():
@@ -82,14 +80,10 @@ def create_table():
         column_name_entry = tk.Entry(main.window, textvariable=column_name_sv)
         column_name_entry.bind(
             "<FocusOut>",
-            lambda _, previous=column_name, sv=column_name_sv,: update_column_name(
-                previous, sv
-            ),
+            lambda _, previous=column_name, sv=column_name_sv,: update_column_name(previous, sv),
         )
         column_name_entry.grid(row=0, column=column_number)
-        column_name_entry.bind(
-            "<Button-3>", lambda _, x=column_name: column_name_right_click_menu(x)
-        )
+        column_name_entry.bind("<Button-3>", lambda _, x=column_name: column_name_right_click_menu(x))
 
     for row_number, row in enumerate(main.context["data"]):
         for column_number, (column_name, value) in enumerate(row.items()):
@@ -108,28 +102,19 @@ def create_table():
             value_entry.grid(row=row_number + 1, column=column_number)
             value_entry.bind(
                 "<Button-3>",
-                lambda _,
-                a=row_number,
-                b=column_name,
-                c=value_string_var: value_right_click_menu(a, b, c),
+                lambda _, a=row_number, b=column_name, c=value_string_var: value_right_click_menu(a, b, c),
             )
             value_entry.bind(
                 "<FocusOut>",
-                lambda _, a=row_number, b=column_name, c=value_string_var: update_value(
-                    a, b, c
-                ),
+                lambda _, a=row_number, b=column_name, c=value_string_var: update_value(a, b, c),
             )
             value_entry.bind(
                 "<Return>",
-                lambda _, a=row_number, b=column_name, c=value_string_var: update_value(
-                    a, b, c
-                ),
+                lambda _, a=row_number, b=column_name, c=value_string_var: update_value(a, b, c),
             )
             value_entry.bind(
                 "<Control-z>",
-                lambda _, a=row_number, b=column_name, c=value_string_var: update_value(
-                    a, b, c
-                ),
+                lambda _, a=row_number, b=column_name, c=value_string_var: update_value(a, b, c),
             )
 
 
@@ -139,6 +124,7 @@ def open_file():
         "sort_key": "",
         "sort_reverse": False,
         "history": [],
+        "save_array_filters": [],
     }
 
     file = filedialog.askopenfile()
@@ -238,9 +224,7 @@ def create_menus():
     menubar.add_cascade(label="Sort", menu=sortmenu)
 
     editmenu = tk.Menu(menubar, tearoff=0)
-    editmenu.add_command(
-        label="Revert to Original", command=lambda: revert_to_original()
-    )
+    editmenu.add_command(label="Revert to Original", command=lambda: revert_to_original())
     editmenu.add_command(label="Add Row", command=lambda: add_row())
     editmenu.add_command(label="Add Column", command=lambda: add_column())
     menubar.add_cascade(label="Edit", menu=editmenu)
@@ -253,13 +237,9 @@ def create_menus():
 
 def column_name_right_click_menu(column_name):
     rightClickMenu = tk.Menu(main.window, tearoff=0)
-    rightClickMenu.add_command(
-        label="Show Stats", command=lambda: show_stats(column_name)
-    )
+    rightClickMenu.add_command(label="Show Stats", command=lambda: show_stats(column_name))
     rightClickMenu.add_command(label="Sort", command=lambda: sort_data(column_name))
-    rightClickMenu.add_command(
-        label="Delete Column", command=lambda: delete_column(column_name)
-    )
+    rightClickMenu.add_command(label="Delete Column", command=lambda: delete_column(column_name))
     rightClickMenu.post(main.window.winfo_pointerx(), main.window.winfo_pointery())
 
 
@@ -267,16 +247,10 @@ def value_right_click_menu(row_number, column_name, value_string_var):
     update_value(row_number, column_name, value_string_var)
 
     rightClickMenu = tk.Menu(main.window, tearoff=0)
-    rightClickMenu.add_command(
-        label="Show Stats", command=lambda: show_stats(column_name)
-    )
+    rightClickMenu.add_command(label="Show Stats", command=lambda: show_stats(column_name))
     rightClickMenu.add_command(label="Sort", command=lambda: sort_data(column_name))
-    rightClickMenu.add_command(
-        label="Delete Row", command=lambda: delete_row(row_number)
-    )
-    rightClickMenu.add_command(
-        label="Delete Column", command=lambda: delete_column(column_name)
-    )
+    rightClickMenu.add_command(label="Delete Row", command=lambda: delete_row(row_number))
+    rightClickMenu.add_command(label="Delete Column", command=lambda: delete_column(column_name))
     rightClickMenu.post(main.window.winfo_pointerx(), main.window.winfo_pointery())
 
 
@@ -317,9 +291,7 @@ def display_data():
 
 def sort_data(column):
     if main.context["sort_key"] == column:
-        main.context["data"].sort(
-            key=lambda x: x[column], reverse=not main.context["sort_reverse"]
-        )
+        main.context["data"].sort(key=lambda x: x[column], reverse=not main.context["sort_reverse"])
         main.context["sort_reverse"] = not main.context["sort_reverse"]
     else:
         main.context["data"].sort(key=lambda x: x[column])
@@ -385,11 +357,7 @@ def show_stats(column):
 
         text = tk.Label(
             windowStats,
-            text="True: "
-            + str(true / len(main.context["data"]) * 100)
-            + "%\nFalse: "
-            + str(false / len(main.context["data"]) * 100)
-            + "%",
+            text="True: " + str(true / len(main.context["data"]) * 100) + "%\nFalse: " + str(false / len(main.context["data"]) * 100) + "%",
         )
         text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
@@ -419,24 +387,9 @@ def show_stats(column):
         if str(avg)[-2:] == ".0":
             avg = int(str(avg)[:-2])
 
-        min_text = (
-            "Min "
-            + ("list" if column_type == list else "string")
-            + " size: "
-            + str(min)
-        )
-        max_text = (
-            "\nMax "
-            + ("list" if column_type == list else "string")
-            + " size: "
-            + str(max)
-        )
-        avg_text = (
-            "\nAvg "
-            + ("list" if column_type == list else "string")
-            + " size: "
-            + str(avg)
-        )
+        min_text = "Min " + ("list" if column_type == list else "string") + " size: " + str(min)
+        max_text = "\nMax " + ("list" if column_type == list else "string") + " size: " + str(max)
+        avg_text = "\nAvg " + ("list" if column_type == list else "string") + " size: " + str(avg)
         text = tk.Label(windowStats, text=min_text + max_text + avg_text)
         text.place(relx=0.5, rely=0.5, anchor="center")
         text.pack()
@@ -510,25 +463,14 @@ def add_search_bar(new_field_var):
     # Operator dropdown
     operator_label = tk.Label(search_frame, text="Operator:")
     operator_label.grid(row=1, column=0, padx=5, pady=5)
-    if field_var.get() != "all":
-        if isinstance(main.context["data"][0][field_var.get()], int) or isinstance(
-            main.context["data"][0][field_var.get()], float
-        ):
-            operator_options = ["=", ">", "<", ">=", "<=", "!="]
-        else:
-            operator_options = [
-                "contains",
-                "starts with",
-                "ends with",
-                "list contains",
-                "list min",
-                "list max",
-                "list avg eq",
-                "list avg lt",
-                "list avg gt",
-            ]
-    else:
+    if field_var.get() == "all":
         operator_options = [
+            "=",
+            "!=",
+            "<",
+            "<=",
+            ">",
+            ">=",
             "contains",
             "starts with",
             "ends with",
@@ -539,6 +481,13 @@ def add_search_bar(new_field_var):
             "list avg lt",
             "list avg gt",
         ]
+    else:
+        if isinstance(main.context["data"][0][field_var.get()], list):
+            operator_options = ["list contains", "list min", "list max", "list avg eq", "list avg lt", "list avg gt"]
+        elif isinstance(main.context["data"][0][field_var.get()], str):
+            operator_options = ["contains", "starts with", "ends with"]
+        else:
+            operator_options = ["=", "!=", "<", "<=", ">", ">="]
 
     operator_var = tk.StringVar(search_frame)
     operator_var.set(operator_options[0])  # Set a default value
@@ -555,9 +504,7 @@ def add_search_bar(new_field_var):
     send_button = tk.Button(
         search_frame,
         text="Send",
-        command=lambda: apply_search(
-            field_var.get(), operator_var.get(), value_entry.get()
-        ),
+        command=lambda: apply_search(field_var.get(), operator_var.get(), value_entry.get()),
     )
     send_button.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
 
@@ -570,23 +517,21 @@ def update_dropdown(x, window):
 
 
 def apply_search(field, operator, value):
-    main.save_array_filters.append(main.context["data"].copy())
-    main.context["data"] = filters.filter_data(
-        main.context["data"], field, operator, value
-    )
+    main.context["save_array_filters"].append(copy.deepcopy(main.context["data"]))
+    main.context["data"] = filters.filter_data(main.context["data"], field, operator, value)
     display_data()
 
 
 def reset_filters():
-    if main.save_array_filters == []:
+    if main.context["save_array_filters"] == []:
         return
-    main.context["data"] = main.save_array_filters[0]
-    main.save_array_filters = []
+    main.context["data"] = main.context["save_array_filters"][0]
+    main.context["save_array_filters"] = []
     display_data()
 
 
 def undo_filters():
-    if main.save_array_filters == []:
+    if main.context["save_array_filters"] == []:
         return
-    main.context["data"] = main.save_array_filters.pop()
+    main.context["data"] = main.context["save_array_filters"].pop()
     display_data()
