@@ -1,11 +1,11 @@
 def filter_data(data, field, operator, value):
     comparison_functions = {
-        "==": lambda x, y: x == y,
-        "!=": lambda x, y: x != y,
-        "<": lambda x, y: x < y,
-        "<=": lambda x, y: x <= y,
-        ">": lambda x, y: x > y,
-        ">=": lambda x, y: x >= y,
+        "=": lambda x, y: float(x) == float(y),
+        "!=": lambda x, y: float(x) != float(y),
+        "<": lambda x, y: float(y) < float(x),
+        "<=": lambda x, y: float(y) <= float(x),
+        ">": lambda x, y: float(y) > float(x),
+        ">=": lambda x, y: float(y) >= float(x),
         "contains": lambda x, y: x in y,
         "starts with": lambda x, y: str.startswith(y, x),
         "ends with": lambda x, y: str.endswith(y, x),
