@@ -517,8 +517,8 @@ def add_search_bar(new_field_var):
     operator_label.grid(row=1, column=0, padx=5, pady=5)
     if field_var.get() != "all":
         if (
-            type(main.context["array"][0][field_var.get()]) == int
-            or type(main.context["array"][0][field_var.get()]) == float
+            type(main.context["data"][0][field_var.get()]) == int
+            or type(main.context["data"][0][field_var.get()]) == float
         ):
             operator_options = ["=", ">", "<", ">=", "<=", "!="]
         else:
@@ -576,9 +576,9 @@ def update_dropdown(x, window):
 
 
 def apply_search(field, operator, value):
-    main.save_array_filters.append(main.context["array"].copy())
-    main.context["array"] = filters.filter_data(
-        main.context["array"], field, operator, value
+    main.save_array_filters.append(main.context["data"].copy())
+    main.context["data"] = filters.filter_data(
+        main.context["data"], field, operator, value
     )
     display_data()
 
@@ -586,7 +586,7 @@ def apply_search(field, operator, value):
 def reset_filters():
     if main.save_array_filters == []:
         return
-    main.context["array"] = main.save_array_filters[0]
+    main.context["data"] = main.save_array_filters[0]
     main.save_array_filters = []
     display_data()
 
@@ -594,5 +594,5 @@ def reset_filters():
 def undo_filters():
     if main.save_array_filters == []:
         return
-    main.context["array"] = main.save_array_filters.pop()
+    main.context["data"] = main.save_array_filters.pop()
     display_data()
