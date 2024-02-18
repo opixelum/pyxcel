@@ -28,9 +28,6 @@ def filter_data(data, field, operator, value):
                     operator == "list contains"
                     or operator == "list min"
                     or operator == "list max"
-                    or operator == "list avg eq"
-                    or operator == "list avg lt"
-                    or operator == "list avg gt"
                 ):
                     if isinstance(entry[new_field], list):
                         if comparison_functions[operator](value, entry[new_field]):
