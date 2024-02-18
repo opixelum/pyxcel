@@ -36,7 +36,6 @@ def update_value(row_number, column_name, value_string_var):
     main.context["data"][row_number][column_name] = new_value
     main.context["data"] = file_parser.unify_column_type(main.context["data"], column_name)
 
-
 def revert_to_original():
     """
     Reverts the array to its original state (before any modification).
