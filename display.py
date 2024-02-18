@@ -1,6 +1,6 @@
+import copy
 import tkinter as tk
 from tkinter import filedialog
-import copy
 
 import file_parser
 import filters
@@ -88,7 +88,7 @@ def create_table():
     for row_number, row in enumerate(main.context["data"]):
         for column_number, (column_name, value) in enumerate(row.items()):
             if type(value) == list:
-                value ="["+ ",".join([str(i) for i in value]) +"]"
+                value = "[" + ",".join([str(i) for i in value]) + "]"
             # If the value is a number ending with .0, display it as an integer
             if str(value)[-2:] == ".0":
                 value = str(value)[:-2]

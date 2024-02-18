@@ -46,11 +46,7 @@ def data_to_json(arr, file_path):
 
 def is_csv_parser(character, separator):
     special_chars = {"\n", "\r", '"', "'", ".", "!", "?", "@", " "}
-    return (
-        not character.isdigit()
-        and not character.isalpha()
-        and character not in special_chars.union({separator})
-    )
+    return not character.isdigit() and not character.isalpha() and character not in special_chars.union({separator})
 
 
 def csv_to_data(file_path):
@@ -145,9 +141,7 @@ def column_type(data, column_name):
     has_non_numeric_or_bool = False  # Flag for any non-numeric and non-boolean string
 
     for row in data:
-        value = str_to_type(str(
-            row[column_name]
-        ).strip())  # Convert value to string and strip whitespace
+        value = str_to_type(str(row[column_name]).strip())  # Convert value to string and strip whitespace
         if isinstance(value, list):
             return list
         # Check if the string is a boolean value
@@ -168,9 +162,7 @@ def column_type(data, column_name):
     if has_non_numeric_or_bool:
         return str  # Any non-numeric/non-boolean string forces the whole column to be strings
     elif has_numeric:
-        return (
-            float if has_float else int
-        )  # Numeric values, prefer float if any decimal points
+        return float if has_float else int  # Numeric values, prefer float if any decimal points
     elif has_strictly_bool:
         return bool  # Only boolean values
     else:
@@ -198,13 +190,9 @@ def unify_column_type(data, column_name):
             converted_value = str(original_value)
         elif target_type == int:
             try:
-                converted_value = int(
-                    float(original_value)
-                )  # Convert via float for cases like '3.0'
+                converted_value = int(float(original_value))  # Convert via float for cases like '3.0'
             except ValueError:
-                converted_value = (
-                    original_value  # Preserve original in case of conversion error
-                )
+                converted_value = original_value  # Preserve original in case of conversion error
         elif target_type == float:
             try:
                 converted_value = float(original_value)
@@ -216,11 +204,7 @@ def unify_column_type(data, column_name):
                 converted_value = original_value.lower() == "true"
             else:
                 # If it's already a boolean, no conversion is needed; otherwise, it cannot be a boolean
-                converted_value = (
-                    original_value
-                    if isinstance(original_value, bool)
-                    else str(original_value)
-                )
+                converted_value = original_value if isinstance(original_value, bool) else str(original_value)
 
         updated_row[column_name] = converted_value
         updated_data.append(updated_row)
