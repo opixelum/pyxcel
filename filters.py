@@ -22,9 +22,15 @@ def filter_data(data, field, operator, value):
     if field == "all":
         for entry in data:
             for new_field in entry:
-                if comparison_functions[operator](value, entry[new_field]):
-                    filter_data.append(entry)
-                    break
+                if operator != "=" and operator != "!=" and operator != "<" and operator != "<=" and operator != ">" and operator != ">=":
+                    if not isinstance(entry[new_field], (int, float)):
+                        if comparison_functions[operator](value, entry[new_field]):
+                            filter_data.append(entry)
+                            break
+                else:
+                    if comparison_functions[operator](value, entry[new_field]):
+                        filter_data.append(entry)
+                        break
     else:
         for entry in data:
             if comparison_functions[operator](value, entry[field]):
