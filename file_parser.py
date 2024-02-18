@@ -29,7 +29,7 @@ def str_to_type(string):
         return False
 
     if string[0] == "[" and string[-1] == "]":
-        return string[1:-1].split(", ")
+        return string[1:-1].split(",")
 
     return string
 
@@ -145,20 +145,20 @@ def column_type(data, column_name):
     has_non_numeric_or_bool = False  # Flag for any non-numeric and non-boolean string
 
     for row in data:
-        value = str(
+        value = str_to_type(str(
             row[column_name]
-        ).strip()  # Convert value to string and strip whitespace
-        lower_value = value.lower()
-
+        ).strip())  # Convert value to string and strip whitespace
+        if isinstance(value, list):
+            return list
         # Check if the string is a boolean value
-        if lower_value in ["true", "false"]:
+        if value in ["true", "false", "True", "False"]:
             has_strictly_bool = True
         else:
             try:
                 # Attempt to convert the string to a float
                 float(value)
                 has_numeric = True
-                if "." in value or "e" in lower_value or "E" in value:
+                if "." in str(value) or "e" in str(value) or "E" in str(value):
                     has_float = True
             except ValueError:
                 # If conversion fails, it's not a valid numeric string
@@ -186,7 +186,15 @@ def unify_column_type(data, column_name):
         original_value = row[column_name]
 
         # Ensure the conversion logic checks for string type before calling .lower()
-        if target_type == str:
+        if target_type == list:
+            # Convert each element in the list to the target type
+            if original_value[0] == "[" and original_value[-1] == "]":
+                converted_value = original_value[1:-1].split(",")
+            elif type(original_value) == list:
+                converted_value = original_value
+            else:
+                converted_value = [original_value]
+        elif target_type == str:
             converted_value = str(original_value)
         elif target_type == int:
             try:
