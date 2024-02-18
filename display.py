@@ -502,7 +502,7 @@ def add_search_bar(new_field_var):
     field_options = (
         main.context["column_names"] if main.context["column_names"] else ["all"]
     )
-    if new_field_var != None:
+    if new_field_var is not None:
         field_var = tk.StringVar(search_frame)
         field_var.set(new_field_var)
     else:
@@ -516,9 +516,8 @@ def add_search_bar(new_field_var):
     operator_label = tk.Label(search_frame, text="Operator:")
     operator_label.grid(row=1, column=0, padx=5, pady=5)
     if field_var.get() != "all":
-        if (
-            type(main.context["data"][0][field_var.get()]) == int
-            or type(main.context["data"][0][field_var.get()]) == float
+        if isinstance(main.context["data"][0][field_var.get()], int) or isinstance(
+            main.context["data"][0][field_var.get()], float
         ):
             operator_options = ["=", ">", "<", ">=", "<=", "!="]
         else:
