@@ -499,9 +499,7 @@ def add_search_bar(new_field_var):
     # Field dropdown
     field_label = tk.Label(search_frame, text="Field:")
     field_label.grid(row=0, column=0, padx=5, pady=5)
-    field_options = (
-        main.context["column_names"] if main.context["column_names"] else ["all"]
-    )
+    field_options = ["all"] + main.context["column_names"] if main.context["column_names"] else ["all"]
     if new_field_var is not None:
         field_var = tk.StringVar(search_frame)
         field_var.set(new_field_var)
